@@ -14,7 +14,7 @@ datasetpath="D:\\IPL\\Mestrado\\1_Ano\\OML\\Projecto\\Clustering_MachineLearning
 datasetUnsupervised=pd.read_excel(datasetpath,skiprows=1)
 labelsUnsupervised=datasetUnsupervised.columns.values
 print(labelsUnsupervised)
-
+print(datasetUnsupervised)
 #print(dataset.values)
 #data=dataset.values[1:,:]
 #print(dataset.isnull().sum())
