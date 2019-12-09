@@ -11,7 +11,16 @@ import sys
 
 #datasetpath=sys.argv[1]
 datasetpath="D:\\IPL\\Mestrado\\1_Ano\\OML\\Projecto\\Clustering_MachineLearning\\Datasets_GroupG.xlsx"
-dataset=np.array(pd.read_excel(datasetpath)).T
-print(dataset)
+datasetUnsupervised=pd.read_excel(datasetpath,skiprows=1)
+labelsUnsupervised=datasetUnsupervised.columns.values
+print(labelsUnsupervised)
 
+#print(dataset.values)
+#data=dataset.values[1:,:]
+#print(dataset.isnull().sum())
+#print(dataset)
+#dataset.fillna(dataset.mean(), inplace=True)
+# count the number of NaN values in each column
+#print(dataset.isnull().sum())
 # %%
+pd.read_excel
