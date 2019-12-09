@@ -23,4 +23,3 @@ print(labelsUnsupervised)
 # count the number of NaN values in each column
 #print(dataset.isnull().sum())
 # %%
-pd.read_excel
