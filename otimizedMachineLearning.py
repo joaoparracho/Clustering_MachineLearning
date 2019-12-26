@@ -38,9 +38,12 @@ def readArgs():
 
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
 [labels,data,dataDist,dataLink]=computeExcelData(dataset,cmpMissData,adaptData,distanceMethod,linkageMethod)
-
 clusteringMtd[cmt](data,dataLink,numCluster)
 
-plotFunction(dendrogram,dataLink,labels=np.array(dataset.values)[:,0])
+plotBiDispersidade(data,None,0)
+plotFunction(dendrogram,dataLink,labels=np.array(dataset.values)[:,0],title='Denogram', ylabel='Distance',xlabel='ID')
+
+
 plt.show()
 # %%prin
+
