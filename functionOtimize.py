@@ -8,6 +8,8 @@ from sklearn.metrics import silhouette_samples, silhouette_score
 from sklearn import preprocessing
 import skfuzzy  as  fuzz
 
+normalizeMtd=[preprocessing.StandardScaler().fit_transform,preprocessing.MinMaxScaler().fit_transform]
+
 def autolabel(rects,ax):
     for rect in rects:
         height = rect.get_height()
@@ -36,7 +38,6 @@ def fancy_dendrogram(*args, **kwargs):
     plt.axhline(y=max_d, c='k',linewidth=4,label='Cutoff line')
     plt.legend()
     dendrogram(*args, **kwargs)
-    print("stop")
 
 def plotFunction(function,*positionalParm,**keyParam):
     plt.figure(figsize=(20.0, 12.0))
@@ -51,7 +52,8 @@ def plotFunction(function,*positionalParm,**keyParam):
 def plotBiDispersidade(data,cluster,i,centroids=[],title="scatter"):
     plt.figure(figsize=(20.0, 12.0))
     plt.scatter(data[:,i],data[:,i+1],c=cluster,cmap='viridis',s=50, label='True  Position')#para  permitir  um  gráfico  de  dispersão  dos dados bidimensionais
-
+    plt.xlabel("Feature "+str(i))
+    plt.ylabel("Feature "+str(i+1))
     for label, x, y in zip(range(1,len(data)), data[:, 0], data[:, 1]):  # procedimento para incluir etiquetas junto aos pontos 
         plt.annotate(label, xy=(x, y),textcoords='offset points', ha='right', va='bottom')
     
@@ -68,7 +70,7 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
     #Normalização é feita por feature 
     #https://scikit-learn.org/stable/modules/preprocessing.html
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
-    data=preprocessing.StandardScaler().fit_transform(np.array(excelDataSet.values)[:,1:]) if adaptData else preprocessing.normalize(np.array(excelDataSet.values)[:,1:])
+    data=normalizeMtd[adaptData](np.array(excelDataSet.values)[:,1:])
     dataDist=pdist(data,distanceMethod)
     dataLink=linkage(dataDist,linkageMethod)
     print(excelDataSet.isnull().sum())
@@ -76,7 +78,6 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
     return excelDataSet.columns.values,data,dataDist,dataLink
 
 def clusterHAlgorithm(data,dataLink,numCluster,strMethod):
-    
     C=fcluster(dataLink,numCluster,'maxclust')
     centroids=np.zeros([numCluster,len(data[0])])
     numObjCluster=np.zeros([numCluster])

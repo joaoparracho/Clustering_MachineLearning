@@ -4,7 +4,7 @@
 from functionOtimize import *
 import argparse
 clusteringMtd=[clusterHAlgorithm,kMeansAlgorithm,fuzzyCmeansAlgorithm]
-
+normStr=["Min_Max","StandarScaler"]
 def readArgs():
     parser = argparse.ArgumentParser(description='Optimization and Machine Learning (MEEE-IPL).'
                                     ,formatter_class=argparse.RawTextHelpFormatter)
@@ -19,8 +19,8 @@ def readArgs():
     Yes : 1''')
     parser.add_argument('-a',type=int,default=0,
     help='''Adapt Data:
-    Normalize    : 0 
-    Standardize  : 1''')
+    Normalize (Min_Max) : 0 
+    Standardize         : 1''')
     parser.add_argument('-dt',type=str,default="euclidean",
     help='''Pairwise Distance method availabe: braycurtis, canberra, chebyshev,
     cityblock, correlation, cosine, dice, euclidean, hamming, jaccard,
@@ -37,9 +37,8 @@ def readArgs():
     args = parser.parse_args()
     return args.d.split(" "),args.c,args.a,args.dt,args.ml,args.nc,args.cmt
 
-
 [[datasetpath,numSkipedRow,sheetname],cmpMissData,adaptData,distanceMethod,linkageMethod,numCluster,cmt]=readArgs()
-strMethod=", Num clusters= "+str(numCluster)+", distMethod="+distanceMethod+", linkMethod="+linkageMethod
+strMethod=", "+normStr[adaptData]+", Num clusters= "+str(numCluster)+", distMethod="+distanceMethod+", linkMethod="+linkageMethod
 
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
 [labels,data,dataDist,dataLink]=computeExcelData(dataset,cmpMissData,adaptData,distanceMethod,linkageMethod)
