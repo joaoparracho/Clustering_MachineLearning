@@ -10,8 +10,13 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
+<<<<<<< HEAD
             "args": ["-d","Datasets_GroupG.xlsx 1 Clustering","-c","0","-a","1","-dt","chebyshev"
             ,"-ml","ward","-nc","3","-cmt","1"]
+=======
+            "args": ["-d","D:\\IPL\\Mestrado\\1_Ano\\OML\\Projecto\\Clustering_MachineLearning\\Datasets_GroupG.xlsx 1 Clustering","-c","0","-a","0","-dt","chebyshev"
+            ,"-ml","ward","-nc","3","-cmt","0"]
+>>>>>>> e978232819b61670504ebe71d54dc351f89c8a8e
         },
         {
             "name": "Python: Remote Attach",

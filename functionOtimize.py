@@ -20,6 +20,8 @@ def autolabel(rects,ax):
 def plotBar(data,**keyParam):
     fig,ax=plt.subplots()
     rects1=ax.bar(np.arange(len(data)),data)
+    xIndex=keyParam.pop('xIndex')
+    plt.xticks(np.arange(xIndex),np.arange(1,xIndex+1))
     plt.xlabel(keyParam.pop('xlabel'))
     plt.ylabel(keyParam.pop('ylabel'))
     plt.title(keyParam.pop('title'))
@@ -49,6 +51,8 @@ def readExcel(excelPath,numSkipedRow=0,sheetName="Clustering"):
     return pd.read_excel(excelPath,sheetName,skiprows=numSkipedRow)
 
 def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="euclidean",linkageMethod="average"):
+    #Normalização é feita por feature 
+    #https://scikit-learn.org/stable/modules/preprocessing.html
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
     data=preprocessing.StandardScaler().fit_transform(np.array(excelDataSet.values)[:,1:]) if adaptData else preprocessing.normalize(np.array(excelDataSet.values)[:,1:])
     dataDist=pdist(data,distanceMethod)
@@ -60,10 +64,13 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
 def clusterAlgorithm(data,dataLink,numCluster):
     C=fcluster(dataLink,numCluster,'maxclust')
     centeroid=np.zeros([numCluster,len(data[0])])
+    numObjCluster=np.zeros([numCluster])
     for i in range(1,numCluster+1):
-        centeroid[i-1,:]=data[C==i,:].mean(axis=0)
-    print(centeroid)
-
+        centeroid[i-1,:]=data[C==i].mean(axis=0)
+        numObjCluster[i-1]=(C==i).sum()
+    print(centeroid) 
+    plotBar(numObjCluster.astype(int),title='Numbero of objects per CLuster', 
+    ylabel='Number of Object',xlabel='Cluster Index',xIndex=len(numObjCluster))
 
 def kMeansAlgorithm(data,dataLink,numCluster):
     
@@ -94,7 +101,7 @@ def kMeansAlgorithm(data,dataLink,numCluster):
 
     print(numObjCluster)
     plotBar(numObjCluster.astype(int),title='Numbero of objects per CLuster', 
-    ylabel='Number of Object',xlabel='Cluster Index')
+    ylabel='Number of Object',xlabel='Cluster Index',xIndex=len(numObjCluster))
 
 def fuzzyCmeans(data,dataL,numCluster):
     cntr, u, u0, d, ObjFunction, p, fpc = fuzz.cluster.cmeans(data.T, 3, 2, error=0.005,maxiter=100, init=None)
