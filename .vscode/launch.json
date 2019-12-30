@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["-d","D:\\IPL\\Mestrado\\1_Ano\\OML\\Projecto\\Clustering_MachineLearning\\Datasets_GroupG.xlsx 1 Clustering","-c","0","-a","0","-dt","chebyshev"
+            "args": ["-d","Datasets_GroupG.xlsx 1 Clustering","-c","0","-a","0","-dt","chebyshev"
             ,"-ml","ward","-nc","3","-cmt","0"]
         },
         {
