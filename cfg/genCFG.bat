@@ -59,8 +59,8 @@ for /l %%d in (0, 1, 0) do (
 					for /l %%n in (2, 1, 6) do (
 						for /l %%z in (0, 1, 1) do (
 							if not exist OAA_!datasheetname[%%d]!_!mssDt[%%c]!_!adpDt[%%a]!_!dist[%%t]!_NumberCluter-%%n_!clusterMethod[%%z]!.cfg (
-								>OAA_!datasheetname[%%d]!_!mssDt[%%c]!_!adpDt[%%a]!_!dist[%%t]!_!lnk[%%m]!_NumberCluter-%%n_!clusterMethod[%%z]!.cfg 2>&1(
-									echo -d !datasetpath! !datasheetname[%%d]! -c %%c -a %%a -dt !dist[%%t]! -ml !lnk[%%m]! -nc %%n -cmt %%z
+								>OAA_!datasheetname[%%d]!_!mssDt[%%c]!_!adpDt[%%a]!_!dist[%%t]!_!lnk[%%m]!_NumberCluter-%%n_!clusterMethod[%%z]!.txt 2>&1(
+									echo -d !datasetpath! 1 !datasheetname[%%d]! -c %%c -a %%a -dt !dist[%%t]! -ml !lnk[%%m]! -nc %%n -cmt %%z
 								)
 							)
 						)
