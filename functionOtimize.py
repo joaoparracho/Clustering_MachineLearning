@@ -1,12 +1,14 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import skfuzzy  as  fuzz
 from scipy.spatial.distance import pdist,squareform #funções pdist e square form deve ser obtidas a partir do package scipy.spatial.distance
 from scipy.cluster.hierarchy import dendrogram, linkage,fcluster
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_samples, silhouette_score
+from sklearn.metrics import silhouette_samples, silhouette_score, accuracy_score, classification_report, confusion_matrix
 from sklearn import preprocessing
-import skfuzzy  as  fuzz
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
 
 normalizeMtd=[preprocessing.StandardScaler().fit_transform,preprocessing.MinMaxScaler().fit_transform]
 
@@ -76,6 +78,13 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
     print(excelDataSet.isnull().sum())
     print(squareform(dataDist))
     return excelDataSet.columns.values,data,dataDist,dataLink
+
+def divideExcelData(excelDataSet,cmpMissData=1,trainP=0.7):
+    excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
+    dataTrain=np.array(excelDataSet)[0:int(len(excelDataSet)*trainP+1),:]
+    dataTest=np.array(excelDataSet)[int(len(excelDataSet)*trainP+1):len(excelDataSet),:]
+
+    return dataTrain,dataTest
 
 def clusterHAlgorithm(data,dataLink,numCluster,strMethod):
     C=fcluster(dataLink,numCluster,'maxclust')
