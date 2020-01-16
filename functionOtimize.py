@@ -11,8 +11,15 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
+<<<<<<< HEAD
 from sklearn.metrics import mean_absolute_error, mean_squared_error 
 #git reset --hard
+=======
+from sklearn.neural_network import MLPRegressor
+from sklearn.svm import SVR
+from sklearn.metrics import mean_absolute_error, mean_squared_error 
+from sklearn.model_selection import GridSearchCV
+>>>>>>> 35f866d1923e4222691ff7c456dd8830e59873c1
 
 normalizeMtd=[preprocessing.StandardScaler().fit_transform,preprocessing.MinMaxScaler().fit_transform]
 
@@ -174,7 +181,8 @@ def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     Y_pred_Test_LR=LR_mdl.predict (dataTest) 
     print (LR_mdl.coef_)
     print (LR_mdl.intercept_)
-    evaluateErrorMetric(outputTest,Y_pred_Test_LR)
+    [MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test]=evaluateErrorMetric(outputTest,Y_pred_Test_LR)
+    BOXPLOTAnalysis(outputTrain,Y_pred_LR,Errors_regression_Test)
 
 def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #Polynomial REGRESSION
@@ -189,12 +197,12 @@ def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     Y_pred_Test_PR=PR_mdl.predict(Inputs_Test_poly)
     print (PR_mdl.coef_)
     print (PR_mdl.intercept_)
-    evaluateErrorMetric(outputTest,Y_pred_Test_PR)
+    [MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test]=evaluateErrorMetric(outputTest,Y_pred_Test_PR)
+    BOXPLOTAnalysis(outputTrain,Y_pred_PR,Errors_regression_Test)    
 
 def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #ANN REGRESSION
     print ('ANN Regression')
-    from sklearn.neural_network import MLPRegressor
     ANN_mdl=MLPRegressor (hidden_layer_sizes = 1, activation ='identity', max_iter=1000000, verbose = 'True',tol=1e-10, early_stopping=False, validation_fraction=0.2)
     ANN_mdl.fit(dataTrain,outputTrain)
     Y_pred_ANN=ANN_mdl.predict(dataTrain)
@@ -205,7 +213,6 @@ def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest):
 def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #SVM REGRESSION
     print ('SVM Regression')
-    from sklearn.svm import SVR
     SVR_mdl= SVR (C=5,kernel='linear',epsilon=0.005)
     SVR_mdl =SVR_mdl.fit(dataTrain,outputTrain)
     Y_pred_SVR=SVR_mdl.predict(dataTrain)
@@ -215,9 +222,7 @@ def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     print(SVR_mdl.dual_coef_)
 
 def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
-#SVR REGRESSION with GridSearch
-    from sklearn.model_selection import GridSearchCV
-    from sklearn.svm import SVR
+    #SVR REGRESSION with GridSearch
     find_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],'C': [1, 10, 100, 1000] , 'epsilon': [0.01, 0.05, 0.1, 0.5]},{'kernel': ['linear'], 'C': [1, 10, 100, 1000] , 'epsilon': [0.01, 0.05, 0.1, 0.5]} ]
     SVR_mdl=GridSearchCV(SVR(),find_parameters,cv=3)
     SVR_mdl.fit(dataTrain,outputTrain)
@@ -226,6 +231,10 @@ def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     Y_pred_Test_SVR=SVR_mdl.predict(dataTest)
 
 def evaluateErrorMetric(outputTest,Y_pred_Test):
+<<<<<<< HEAD
+=======
+    #EVALUATE ERROR METRICS
+>>>>>>> 35f866d1923e4222691ff7c456dd8830e59873c1
     # MAE Calculus
     MAE_regression_Test=mean_absolute_error(outputTest,Y_pred_Test)
     # MSE Calculus
@@ -238,17 +247,16 @@ def evaluateErrorMetric(outputTest,Y_pred_Test):
     # MAPE Calculus
     Percentual_Errors_regression=np.divide(np.abs(Errors_regression_Test),outputTest)
     MAPE_regression_Test=np.mean(Percentual_Errors_regression)
-    return MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,SSE_regression_Test,MAPE_regression_Test
+    return MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test
 
-#def BOXPLOTAnalysis():
-    # BOXPLOT Analysis
-#    import matplotlib.pyplot as plt
- #   Errors_ANN_Train=np.subtract(Outputs_Train,Y_pred_ANN)
- #   Errors_ANN=np.concatenate((Errors_ANN_Train,Errors_ANN_Test))
-  #  fig1, ax1 = plt.subplots()
-   # ax1.set_title('Basic Plot')
-    #ax1.boxplot(Errors_ANN)
-   # plt.show()
+def BOXPLOTAnalysis(outputTrain,Y_pred_regression,Errors_regression_Test):  
+# BOXPLOT Analysis
+    Errors_regression_Train=np.subtract(outputTrain,Y_pred_regression)
+    Errors_regression=np.concatenate((Errors_regression_Train,Errors_regression_Test))
+    fig1, ax1 = plt.subplots()
+    ax1.set_title('Basic Plot')
+    ax1.boxplot(Errors_regression)
+    plt.show()
 
 def writeLog(fileName,numObgjW,listStr,listStrTitle):
     file1 = open(fileName,"w") 
