@@ -10,14 +10,8 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-<<<<<<< HEAD
             //"args": ["-d","Datasets_GroupG.xlsx 1 Clustering","-c","0","-a","0","-dt","chebyshev","-ml","ward","-nc","3","-cmt","0"]
-            "args": ["-d","Datasets_GroupG.xlsx 1 Regression"]
-=======
-            //"args": ["-d","Datasets_GroupG.xlsx 1 Clustering","-c","0","-a","0","-dt","euclidean"
-           // ,"-ml","complete","-nc","3","-cmt","1"]
-            "args": ["-d","Datasets_GroupG.xlsx 0 Regression","-c","0","-a","0","-nn","3","-tp","0.6","-cmt","1"]
->>>>>>> 6f5e57be038b9a5ebe0d8590f491b5e17a655996
+            "args": ["-d","Datasets_GroupG.xlsx 0 Regression","-rmt","0","-tp","0.8"]
         },
         {
             "name": "Python: Remote Attach",

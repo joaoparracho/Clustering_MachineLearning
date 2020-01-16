@@ -9,6 +9,8 @@ from sklearn.metrics import silhouette_samples, silhouette_score, accuracy_score
 from sklearn import preprocessing
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
 
 normalizeMtd=[preprocessing.StandardScaler().fit_transform,preprocessing.MinMaxScaler().fit_transform]
 
@@ -80,11 +82,14 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
     return excelDataSet.columns.values,data,dataDist,dataLink
 
 def divideExcelData(excelDataSet,cmpMissData=1,trainP=0.7):
+    trainSize=int(len(excelDataSet)*trainP+1)
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
-    dataTrain=np.array(excelDataSet)[0:int(len(excelDataSet)*trainP+1),:]
-    dataTest=np.array(excelDataSet)[int(len(excelDataSet)*trainP+1):len(excelDataSet),:]
+    dataTrain=np.array(excelDataSet)[0:trainSize,0:len(excelDataSet.columns)-1]
+    outputTrain=np.array(excelDataSet)[0:trainSize,len(excelDataSet.columns)-1]
+    dataTest=np.array(excelDataSet)[trainSize:len(excelDataSet),0:len(excelDataSet.columns)-1]
+    outputTest= np.array(excelDataSet)[trainSize:len(excelDataSet),len(excelDataSet.columns)-1]
 
-    return dataTrain,dataTest
+    return dataTrain,dataTest,outputTrain,outputTest
 
 def clusterHAlgorithm(data,dataLink,numCluster,strMethod):
     C=fcluster(dataLink,numCluster,'maxclust')
@@ -158,6 +163,93 @@ def fuzzyCmeansAlgorithm(data,dataL,numCluster,strMethod):
     plotBar(numObjCluster.astype(int),title='FuzzyCmeans_Number of objects per CLuster'+strMethod, 
     ylabel='Number of Object',xlabel='Cluster Index',xIndex=len(numObjCluster))
     
+def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+    #LINEAR REGRESSION
+    print ('Linear Regression')
+    LR_mdl=LinearRegression() 
+    LR_mdl.fit (dataTrain,outputTrain) 
+    Y_pred_LR=LR_mdl.predict (dataTrain) 
+    Y_pred_Test_LR=LR_mdl.predict (dataTest) 
+    print (LR_mdl.coef_)
+    print (LR_mdl.intercept_)
+    evaluateErrorMetric(outputTest,Y_pred_Test_LR)
+
+def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+    #Polynomial REGRESSION
+    print ('Polynomial Regression')
+    poly_features=PolynomialFeatures(degree=2)
+    Inputs_poly=poly_features.fit_transform(dataTrain)
+    Inputs_Test_poly=poly_features.fit_transform(dataTest)
+
+    PR_mdl=LinearRegression()
+    PR_mdl.fit(Inputs_poly,outputTrain)
+    Y_pred_PR=PR_mdl.predict(Inputs_poly)
+    Y_pred_Test_PR=PR_mdl.predict(Inputs_Test_poly)
+    print (PR_mdl.coef_)
+    print (PR_mdl.intercept_)
+    evaluateErrorMetric(outputTest,Y_pred_Test_PR)
+
+def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+    #ANN REGRESSION
+    print ('ANN Regression')
+    from sklearn.neural_network import MLPRegressor
+    ANN_mdl=MLPRegressor (hidden_layer_sizes = 1, activation ='identity', max_iter=1000000, verbose = 'True',tol=1e-10, early_stopping=False, validation_fraction=0.2)
+    ANN_mdl.fit(dataTrain,outputTrain)
+    Y_pred_ANN=ANN_mdl.predict(dataTrain)
+    Y_pred_Test_ANN=ANN_mdl.predict(dataTest)
+    print (ANN_mdl.coefs_)
+    print (ANN_mdl.intercepts_)
+
+def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+    #SVM REGRESSION
+    print ('SVM Regression')
+    from sklearn.svm import SVR
+    SVR_mdl= SVR (C=5,kernel='linear',epsilon=0.005)
+    SVR_mdl =SVR_mdl.fit(dataTrain,outputTrain)
+    Y_pred_SVR=SVR_mdl.predict(dataTrain)
+    Y_pred_Test_SVR=SVR_mdl.predict(dataTest)
+    indexes_SVR=SVR_mdl.support_
+    sv=SVR_mdl.support_vectors_
+    print(SVR_mdl.dual_coef_)
+
+def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+#SVR REGRESSION with GridSearch
+    from sklearn.model_selection import GridSearchCV
+    from sklearn.svm import SVR
+    find_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],'C': [1, 10, 100, 1000] , 'epsilon': [0.01, 0.05, 0.1, 0.5]},{'kernel': ['linear'], 'C': [1, 10, 100, 1000] , 'epsilon': [0.01, 0.05, 0.1, 0.5]} ]
+    SVR_mdl=GridSearchCV(SVR(),find_parameters,cv=3)
+    SVR_mdl.fit(dataTrain,outputTrain)
+    SVR_mdl.best_params_
+    Y_pred_SVR=SVR_mdl.predict(dataTrain)
+    Y_pred_Test_SVR=SVR_mdl.predict(dataTest)
+
+def evaluateErrorMetric(outputTest,Y_pred_Test):
+    #EVALUATE ERROR METRICS
+    from sklearn.metrics import mean_absolute_error, mean_squared_error 
+    # MAE Calculus
+    MAE_regression_Test=mean_absolute_error(outputTest,Y_pred_Test)
+    # MSE Calculus
+    MSE_regression_Test=mean_squared_error(outputTest,Y_pred_Test)
+    # RMSE Calculus
+    RMSE_regression_Test=np.sqrt(mean_squared_error(outputTest,Y_pred_Test))
+    # SSE Calculus
+    Errors_regression_Test=np.subtract(outputTest,Y_pred_Test)
+    SSE_regression_Test=np.sum(Errors_regression_Test*Errors_regression_Test)
+    # MAPE Calculus
+    Percentual_Errors_regression=np.divide(np.abs(Errors_regression_Test),outputTest)
+    MAPE_regression_Test=np.mean(Percentual_Errors_regression)
+    return MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,SSE_regression_Test,MAPE_regression_Test
+
+#def BOXPLOTAnalysis():
+    # BOXPLOT Analysis
+#    import matplotlib.pyplot as plt
+ #   Errors_ANN_Train=np.subtract(Outputs_Train,Y_pred_ANN)
+ #   Errors_ANN=np.concatenate((Errors_ANN_Train,Errors_ANN_Test))
+  #  fig1, ax1 = plt.subplots()
+   # ax1.set_title('Basic Plot')
+    #ax1.boxplot(Errors_ANN)
+   # plt.show()
+
 def writeLog(fileName,numObgjW,listStr,listStrTitle):
     file1 = open(fileName,"w") 
     for i in range(0,numObgjW):

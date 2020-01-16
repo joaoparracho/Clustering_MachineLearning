@@ -10,21 +10,21 @@ dataset=pd.read_excel("Datasets_GroupG.xlsx","Regression")
 #plt.show()
 #dataset=readExcel("Datasets_GroupG.xlsx",int(1),"Regression")
 
-Inputs= pd.DataFrame(dataset, columns= ['Direct Normal Solar (kW)','Occupancy Factor','Wind Speed (m/s)'])
+Inputs= pd.DataFrame(dataset, columns= ['DIA','MES','ANO','HORA','Direct Normal Solar (kW)','Occupancy Factor','Wind Speed (m/s)'])
 Outputs= pd.DataFrame(dataset, columns= ['P (kW)'])
 
-percentageData=70 
+percentageData=80 
 train_size=int(percentageData/100*len(Inputs))
 
-Inputs_Train=Inputs[0:train_size]
-Inputs_Test=Inputs[train_size:]
-Outputs_Train=Outputs[0:train_size]
-Outputs_Test=Outputs[train_size:]
+Inputs_Train=np.array(Inputs[0:train_size])
+Inputs_Test=np.array(Inputs[train_size:])
+Outputs_Train=np.array(Outputs[0:train_size])
+Outputs_Test=np.array(Outputs[train_size:])
 
 
 #LINEAR REGRESSION
 print ('Linear Regression')
-LR_mdl=LinearRegression() 
+LR_mdl=LinearRegression(normalize=True) 
 LR_mdl.fit (Inputs_Train,Outputs_Train) 
 Y_pred_LR=LR_mdl.predict (Inputs) 
 Y_pred_Test_LR=LR_mdl.predict (Inputs_Test) 
@@ -67,13 +67,13 @@ sv=SVR_mdl.support_vectors_
 print(SVR_mdl.dual_coef_)
 
 #SVR REGRESSION with GridSearch
-from sklearn.model_selection import GridSearchCV
-find_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],'C': [1, 10, 100, 1000] , 'epsilon': [0.01, 0.05, 0.1, 0.5]},{'kernel': ['linear'], 'C': [1, 10, 100, 1000] , 'epsilon': [0.01, 0.05, 0.1, 0.5]} ]
-SVR_mdl=GridSearchCV(SVR(),find_parameters,cv=3)
-SVR_mdl.fit(Inputs_Train,Outputs_Train)
-SVR_mdl.best_params_
-Y_pred_SVR=SVR_mdl.predict(Inputs_Train)
-Y_pred_Test_SVR=SVR_mdl.predict(Inputs_Test)
+#from sklearn.model_selection import GridSearchCV
+#find_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],'C': [1, 10, 100, 1000] , 'epsilon': [0.01, 0.05, 0.1, 0.5]},{'kernel': ['linear'], 'C': [1, 10, 100, 1000] , 'epsilon': [0.01, 0.05, 0.1, 0.5]} ]
+#SVR_mdl=GridSearchCV(SVR(),find_parameters,cv=3)
+#SVR_mdl.fit(Inputs_Train,Outputs_Train)
+#SVR_mdl.best_params_
+#Y_pred_SVR=SVR_mdl.predict(Inputs_Train)
+#Y_pred_Test_SVR=SVR_mdl.predict(Inputs_Test)
 
 
 # EVALUATE ERROR METRICS (only for Test Subset)
