@@ -9,13 +9,11 @@ from sklearn.metrics import silhouette_samples, silhouette_score, accuracy_score
 from sklearn import preprocessing
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-<<<<<<< HEAD
-#git reset --hard
-=======
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.metrics import mean_absolute_error, mean_squared_error 
+#git reset --hard
 
->>>>>>> ac01ec9c40a945cf69c912c7f8cfe65340d996ce
 normalizeMtd=[preprocessing.StandardScaler().fit_transform,preprocessing.MinMaxScaler().fit_transform]
 
 def autolabel(rects,ax):
@@ -228,8 +226,6 @@ def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     Y_pred_Test_SVR=SVR_mdl.predict(dataTest)
 
 def evaluateErrorMetric(outputTest,Y_pred_Test):
-    #EVALUATE ERROR METRICS
-    from sklearn.metrics import mean_absolute_error, mean_squared_error 
     # MAE Calculus
     MAE_regression_Test=mean_absolute_error(outputTest,Y_pred_Test)
     # MSE Calculus
