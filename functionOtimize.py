@@ -176,8 +176,8 @@ def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     Y_pred_Test_LR=LR_mdl.predict (dataTest) 
     print (LR_mdl.coef_)
     print (LR_mdl.intercept_)
-    [MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test]=evaluateErrorMetric(outputTest,Y_pred_Test_LR)
-    BOXPLOTAnalysis(outputTrain,Y_pred_LR,Errors_regression_Test)
+    return Y_pred_LR,Y_pred_Test_LR
+
 
 def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #Polynomial REGRESSION
@@ -192,8 +192,7 @@ def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     Y_pred_Test_PR=PR_mdl.predict(Inputs_Test_poly)
     print (PR_mdl.coef_)
     print (PR_mdl.intercept_)
-    [MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test]=evaluateErrorMetric(outputTest,Y_pred_Test_PR)
-    BOXPLOTAnalysis(outputTrain,Y_pred_PR,Errors_regression_Test)    
+    return Y_pred_PR,Y_pred_Test_PR  
 
 def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #ANN REGRESSION
@@ -204,6 +203,7 @@ def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     Y_pred_Test_ANN=ANN_mdl.predict(dataTest)
     print (ANN_mdl.coefs_)
     print (ANN_mdl.intercepts_)
+    return Y_pred_ANN,Y_pred_Test_ANN 
 
 def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #SVM REGRESSION
@@ -215,6 +215,7 @@ def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     indexes_SVR=SVR_mdl.support_
     sv=SVR_mdl.support_vectors_
     print(SVR_mdl.dual_coef_)
+    return Y_pred_SVR,Y_pred_Test_SVR 
 
 def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #SVR REGRESSION with GridSearch
@@ -224,6 +225,7 @@ def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     SVR_mdl.best_params_
     Y_pred_SVR=SVR_mdl.predict(dataTrain)
     Y_pred_Test_SVR=SVR_mdl.predict(dataTest)
+    return Y_pred_SVR,Y_pred_Test_SVR 
 
 def evaluateErrorMetric(outputTest,Y_pred_Test):
     #EVALUATE ERROR METRICS

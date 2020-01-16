@@ -31,5 +31,7 @@ def readArgs():
 #strMethod=", "+normStr[adaptData]+", Num clusters= "+str(numCluster)+", distMethod="+distanceMethod+", linkMethod="+linkageMethod
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
 [dataTrain,dataTest,outputTrain,outputTest]=divideExcelData(dataset,cmpMissData,trainP)
-regressionMtd[rmt](dataTrain[:,4:7],dataTest[:,4:7],outputTrain,outputTest)
+[Y_pred,Y_pred_Test]=regressionMtd[rmt](dataTrain[:,4:7],dataTest[:,4:7],outputTrain,outputTest)
+[MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test]=evaluateErrorMetric(outputTest,Y_pred_Test)
+BOXPLOTAnalysis(outputTrain,Y_pred,Errors_regression_Test)
 print("Here fir ")
