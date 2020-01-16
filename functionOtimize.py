@@ -9,7 +9,7 @@ from sklearn.metrics import silhouette_samples, silhouette_score, accuracy_score
 from sklearn import preprocessing
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-
+#git reset --hard
 normalizeMtd=[preprocessing.StandardScaler().fit_transform,preprocessing.MinMaxScaler().fit_transform]
 
 def autolabel(rects,ax):
@@ -74,7 +74,7 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
     data=normalizeMtd[adaptData](np.array(excelDataSet.values)[:,1:])
     dataDist=pdist(data,distanceMethod)
-    dataLink=linkage(dataDist,linkageMethod)
+    dataLink=linkage(data,linkageMethod)
     print(excelDataSet.isnull().sum())
     print(squareform(dataDist))
     return excelDataSet.columns.values,data,dataDist,dataLink
