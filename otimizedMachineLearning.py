@@ -35,7 +35,7 @@ def readArgs():
     return args.d.split(" "),args.c,args.a,args.dt,args.ml,args.nc,args.cmt
 
 [[datasetpath,numSkipedRow,sheetname],cmpMissData,adaptData,distanceMethod,linkageMethod,numCluster,cmt]=readArgs()
-
+#%%
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
 [labels,data,dataDist,dataLink]=computeExcelData(dataset,cmpMissData,adaptData,distanceMethod,linkageMethod)
 clusteringMtd[cmt](data,dataLink,numCluster)
