@@ -88,12 +88,14 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
 def divideExcelData(excelDataSet,cmpMissData=1,trainP=0.7):
     trainSize=int(len(excelDataSet)*trainP+1)
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
-    dataTrain=np.array(excelDataSet)[0:trainSize,0:len(excelDataSet.columns)-1]
+    Inputs=np.array(excelDataSet)[:,1:len(excelDataSet.columns)-1]
+    Outputs=np.array(excelDataSet)[:,len(excelDataSet.columns)-1]
+    dataTrain=np.array(excelDataSet)[0:trainSize,1:len(excelDataSet.columns)-1]
     outputTrain=np.array(excelDataSet)[0:trainSize,len(excelDataSet.columns)-1]
-    dataTest=np.array(excelDataSet)[trainSize:len(excelDataSet),0:len(excelDataSet.columns)-1]
+    dataTest=np.array(excelDataSet)[trainSize:len(excelDataSet),1:len(excelDataSet.columns)-1]
     outputTest= np.array(excelDataSet)[trainSize:len(excelDataSet),len(excelDataSet.columns)-1]
 
-    return dataTrain,dataTest,outputTrain,outputTest
+    return Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest
 
 def clusterHAlgorithm(data,dataLink,numCluster,strMethod):
     C=fcluster(dataLink,numCluster,'maxclust')
@@ -249,7 +251,7 @@ def BOXPLOTAnalysis(outputTrain,Y_pred_regression,Errors_regression_Test):
     Errors_regression=np.concatenate((Errors_regression_Train,Errors_regression_Test))
     fig, axs = plt.subplots()
     axs.boxplot(Errors_regression)
-    axs.set_title('basic plot')
+    axs.set_title('Basic plot')
   
 
 
