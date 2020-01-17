@@ -184,7 +184,7 @@ def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):
 def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #Polynomial REGRESSION
     print ('Polynomial Regression')
-    poly_features=PolynomialFeatures(degree=3)
+    poly_features=PolynomialFeatures(degree=2)
     Inputs_poly=poly_features.fit_transform(dataTrain)
     Inputs_Test_poly=poly_features.fit_transform(dataTest)
 
@@ -251,7 +251,7 @@ def BOXPLOTAnalysis(outputTrain,Y_pred_regression,Errors_regression_Test):
     Errors_regression=np.concatenate((Errors_regression_Train,Errors_regression_Test))
     fig, axs = plt.subplots()
     axs.boxplot(Errors_regression)
-    axs.set_title('Basic plot')
+    axs.set_title('Error Basic plot')
   
 
 
