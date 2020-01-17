@@ -30,8 +30,19 @@ def readArgs():
 [[datasetpath,numSkipedRow,sheetname],cmpMissData,adaptData,numNeurons,trainP,rmt]=readArgs()
 #strMethod=", "+normStr[adaptData]+", Num clusters= "+str(numCluster)+", distMethod="+distanceMethod+", linkMethod="+linkageMethod
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
+Inputs= pd.DataFrame(dataset, columns= ['Direct Normal Solar (kW)','Occupancy Factor','Wind Speed (m/s)']).astype(float).values
+Outputs= pd.DataFrame(dataset, columns= ['P (kW)']).astype(float).values
 [dataTrain,dataTest,outputTrain,outputTest]=divideExcelData(dataset,cmpMissData,trainP)
 [Y_pred,Y_pred_Test]=regressionMtd[rmt](dataTrain[:,4:7],dataTest[:,4:7],outputTrain,outputTest)
+
 [MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test]=evaluateErrorMetric(outputTest,Y_pred_Test)
+print("EVALUATE ERROR METRICS:",MAE_regression_Test,"",MSE_regression_Test,"",RMSE_regression_Test,"",Errors_regression_Test,"",SSE_regression_Test,"",MAPE_regression_Test)
 BOXPLOTAnalysis(outputTrain,Y_pred,Errors_regression_Test)
-print("Here fir ")
+
+# Cross Correlation and Auto Correlation Analysis
+print(np.corrcoef(Inputs[:,0], Outputs[:,0]))
+print(np.corrcoef(Inputs[:,1], Outputs[:,0]))
+print(np.corrcoef(Inputs[:,2], Outputs[:,0]))
+from statsmodels.graphics.tsaplots import plot_acf
+plot_acf(Outputs[:,0]) # Autocorrelation of Output
+plt.show()

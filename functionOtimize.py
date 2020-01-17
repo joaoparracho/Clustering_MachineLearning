@@ -247,10 +247,12 @@ def BOXPLOTAnalysis(outputTrain,Y_pred_regression,Errors_regression_Test):
 # BOXPLOT Analysis
     Errors_regression_Train=np.subtract(outputTrain,Y_pred_regression)
     Errors_regression=np.concatenate((Errors_regression_Train,Errors_regression_Test))
-    fig1, ax1 = plt.subplots()
-    ax1.set_title('Basic Plot')
-    ax1.boxplot(Errors_regression)
-    plt.show()
+    fig, axs = plt.subplots()
+    axs.boxplot(Errors_regression)
+    axs.set_title('basic plot')
+  
+
+
 
 def writeLog(fileName,numObgjW,listStr,listStrTitle):
     file1 = open(fileName,"w") 
