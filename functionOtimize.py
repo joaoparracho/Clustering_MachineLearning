@@ -184,7 +184,7 @@ def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):
 def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #Polynomial REGRESSION
     print ('Polynomial Regression')
-    poly_features=PolynomialFeatures(degree=2)
+    poly_features=PolynomialFeatures(degree=3)
     Inputs_poly=poly_features.fit_transform(dataTrain)
     Inputs_Test_poly=poly_features.fit_transform(dataTest)
 
@@ -231,16 +231,16 @@ def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest):
 
 def evaluateErrorMetric(outputTest,Y_pred_Test):
     #EVALUATE ERROR METRICS
-    # MAE Calculus
+    # Mean Absolute Error (MAE) – Erro Absoluto Médio
     MAE_regression_Test=mean_absolute_error(outputTest,Y_pred_Test)
-    # MSE Calculus
+    # Mean Squared Error (MSE) – Erro Quadrático Médio
     MSE_regression_Test=mean_squared_error(outputTest,Y_pred_Test)
-    # RMSE Calculus
+    # Root Mean Squared Error (RMSE) – Raíz Quadrada do Erro Quadrático Médio
     RMSE_regression_Test=np.sqrt(mean_squared_error(outputTest,Y_pred_Test))
-    # SSE Calculus
+    # Sum of Squared Errors (SSE) – Soma de Erros Quadráticos
     Errors_regression_Test=np.subtract(outputTest,Y_pred_Test)
     SSE_regression_Test=np.sum(Errors_regression_Test*Errors_regression_Test)
-    # MAPE Calculus
+    # Mean Absolute Percentage Error (MAPE) – Erro Percentual Absoluto Médio
     Percentual_Errors_regression=np.divide(np.abs(Errors_regression_Test),outputTest)
     MAPE_regression_Test=np.mean(Percentual_Errors_regression)
     return MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test
