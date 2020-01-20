@@ -42,11 +42,9 @@ dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
 print("EVALUATE ERROR METRICS","\nMAE",MAE_regression_Test,"\nMSE:",MSE_regression_Test,"\nRMSE:",RMSE_regression_Test,"\nSSE:",SSE_regression_Test,"\nMAPE:",MAPE_regression_Test,"\n")
 BOXPLOTAnalysis(outputTrain,Y_pred,Errors_regression_Test)
 
-
 # Cross Correlation and Auto Correlation Analysis
 for x in range(0, 3):
     print(np.corrcoef(Inputs[:,x].astype(float),Outputs.astype(float)))
-
 
 from statsmodels.graphics.tsaplots import plot_acf
 plot_acf(Outputs.astype(float)) # Autocorrelation of Output

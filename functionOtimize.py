@@ -86,14 +86,24 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
     return excelDataSet.columns.values,data,dataDist,dataLink
 
 def divideExcelData(excelDataSet,cmpMissData=1,trainP=0.7):
+    #1Novembro 7298 --> 31 Dezembro fim dados
     trainSize=int(len(excelDataSet)*trainP+1)
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
+    
     Inputs=np.array(excelDataSet)[:,1:len(excelDataSet.columns)-1]
     Outputs=np.array(excelDataSet)[:,len(excelDataSet.columns)-1]
+    #Traino,validação
+    dataTrain=np.array(excelDataSet)[0:7289,1:len(excelDataSet.columns)-1]
+    trainSize=int(len(dataTrain)*trainP+1)
     dataTrain=np.array(excelDataSet)[0:trainSize,1:len(excelDataSet.columns)-1]
     outputTrain=np.array(excelDataSet)[0:trainSize,len(excelDataSet.columns)-1]
-    dataTest=np.array(excelDataSet)[trainSize:len(excelDataSet),1:len(excelDataSet.columns)-1]
-    outputTest= np.array(excelDataSet)[trainSize:len(excelDataSet),len(excelDataSet.columns)-1]
+    dataValid=np.array(excelDataSet)[trainSize:len(excelDataSet),1:len(excelDataSet.columns)-1]
+    outputValid=np.array(excelDataSet)[trainSize:len(excelDataSet),len(excelDataSet.columns)-1]
+    #teste
+    dataTest=np.array(excelDataSet)[7298:len(excelDataSet),1:len(excelDataSet.columns)-1]
+    outputTest= np.array(excelDataSet)[7298:len(excelDataSet),len(excelDataSet.columns)-1]
+    #dataTest=np.array(excelDataSet)[trainSize:len(excelDataSet),1:len(excelDataSet.columns)-1]
+    #outputTest= np.array(excelDataSet)[trainSize:len(excelDataSet),len(excelDataSet.columns)-1]
 
     return Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest
 
@@ -252,9 +262,6 @@ def BOXPLOTAnalysis(outputTrain,Y_pred_regression,Errors_regression_Test):
     fig, axs = plt.subplots()
     axs.boxplot(Errors_regression)
     axs.set_title('Error Basic plot')
-  
-
-
 
 def writeLog(fileName,numObgjW,listStr,listStrTitle):
     file1 = open(fileName,"w") 
