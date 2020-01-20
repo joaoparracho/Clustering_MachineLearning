@@ -15,6 +15,8 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.svm import SVR
 from sklearn.metrics import mean_absolute_error, mean_squared_error 
 from sklearn.model_selection import GridSearchCV
+from statsmodels.graphics.tsaplots import plot_acf
+
 
 normalizeMtd=[preprocessing.StandardScaler().fit_transform,preprocessing.MinMaxScaler().fit_transform]
 
@@ -88,15 +90,26 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
 def divideExcelData(excelDataSet,cmpMissData=1):
     #1Novembro 7298 --> 31 Dezembro fim dados
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
-    
     Inputs=np.array(excelDataSet)[:,1:len(excelDataSet.columns)-1]
     Outputs=np.array(excelDataSet)[:,len(excelDataSet.columns)-1]
-    #Traino,validação
+    # Cross Correlation and Auto Correlation Analysis
+    # Direct Normal Solar (kW) --> 0.53904677
+    # Occupancy Factor --> 0.8804244
+    # Wind Speed (m/s) --> 0.21149389
+    for x in range(0, 3):
+        print(np.corrcoef(Inputs[:,x].astype(float),Outputs.astype(float)))
+    # Autocorrelation of Output --> segundo a autocorrelação a "periodo" de repetição é de 168/24=7dias 
+    plot_acf(Outputs.astype(float), lags=400) 
+    plt.show(block=False)
+
     dataTrain=np.array(excelDataSet)[0:7289,1:len(excelDataSet.columns)-1]
     outputTrain=np.array(excelDataSet)[0:7289,len(excelDataSet.columns)-1]
     dataTest=np.array(excelDataSet)[7298:len(excelDataSet),1:len(excelDataSet.columns)-1]
     outputTest= np.array(excelDataSet)[7298:len(excelDataSet),len(excelDataSet.columns)-1]
-  
+
+
+    
+    
     return Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest
 
 def clusterHAlgorithm(data,dataLink,numCluster,strMethod):
@@ -254,6 +267,8 @@ def BOXPLOTAnalysis(outputTrain,Y_pred_regression,Errors_regression_Test):
     fig, axs = plt.subplots()
     axs.boxplot(Errors_regression)
     axs.set_title('Error Basic plot')
+    plt.show(block=False)
+
 
 def writeLog(fileName,numObgjW,listStr,listStrTitle):
     file1 = open(fileName,"w") 
