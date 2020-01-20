@@ -17,7 +17,6 @@ def readArgs():
     help='''Adapt Data:
     Normalize (Min_Max) : 0 
     Standardize         : 1''')
-    parser.add_argument('-tp' ,type=float,default=0.6,help="Train Percentage (0.01 - 0.99)")
     parser.add_argument('-rmt',type=int,default=0,help='''Select Regression Method: 
     Linear: 0
     Polynomial: 1
@@ -29,13 +28,13 @@ def readArgs():
 
 
     args = parser.parse_args()
-    return args.d.split(" "),args.c,args.a,args.tp,args.rmt,args.deg,args.nn
+    return args.d.split(" "),args.c,args.a,args.rmt,args.deg,args.nn
 
 
-[[datasetpath,numSkipedRow,sheetname],cmpMissData,adaptData,trainP,rmt,polynomialDegree,numNeurons]=readArgs()
+[[datasetpath,numSkipedRow,sheetname],cmpMissData,adaptData,rmt,polynomialDegree,numNeurons]=readArgs()
 #strMethod=", "+normStr[adaptData]+", Num clusters= "+str(numCluster)+", distMethod="+distanceMethod+", linkMethod="+linkageMethod
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
-[Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest]=divideExcelData(dataset,cmpMissData,trainP)
+[Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest]=divideExcelData(dataset,cmpMissData)
 [Y_pred,Y_pred_Test]=regressionMtd[rmt](dataTrain,dataTest,outputTrain,outputTest)
 
 [MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test]=evaluateErrorMetric(outputTest,Y_pred_Test)
@@ -49,6 +48,7 @@ for x in range(0, 3):
 from statsmodels.graphics.tsaplots import plot_acf
 plot_acf(Outputs.astype(float)) # Autocorrelation of Output
 plt.show(block=False)
+
 plt.show()
 
 
