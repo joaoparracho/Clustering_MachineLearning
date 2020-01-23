@@ -49,6 +49,17 @@ def fancy_dendrogram(*args, **kwargs):
     plt.legend()
     dendrogram(*args, **kwargs)
 
+def fancy_boxplot(*args, **kwargs):
+    facecolor = kwargs.pop('facecolor', None)
+    labels = kwargs.pop('labels', None)
+    boxes=plt.boxplot(*args, **kwargs, patch_artist=True)
+    for x in range(0,len(boxes["boxes"])):
+        plt.setp(boxes["boxes"][x],color=facecolor[x])
+        plt.setp(boxes["fliers"][x], markeredgecolor=facecolor[x])
+    plt.legend(boxes["boxes"], labels,loc='upper center', bbox_to_anchor=(0.5, -0.05),
+          fancybox=True, shadow=True, ncol=int(len(boxes["boxes"])/3))     
+      
+
 def plotFunction(function,*positionalParm,**keyParam):
     plt.figure(figsize=(20.0, 12.0))
     title=keyParam.pop('title')
@@ -98,26 +109,36 @@ def divideExcelData(excelDataSet,cmpMissData=1):
     # Wind Speed (m/s) --> 0.21149389
     for x in range(0, 3):
         print(np.corrcoef(Inputs[:,x].astype(float),Outputs.astype(float)))
+    
+    print('\n')  
     # Autocorrelation of Output --> segundo a autocorrelação a "periodo" de repetição é de 168/24=7dias 
     plot_acf(Outputs.astype(float), lags=400) 
     plt.show(block=False)
 
     #1Novembro 7298 --> 31 Dezembro fim dados
-    dataTrain=np.array(excelDataSet)[0:7289,1:len(excelDataSet.columns)-1]
-    outputTrain=np.array(excelDataSet)[0:7289,len(excelDataSet.columns)-1]
-    dataTest=np.array(excelDataSet)[7298:len(excelDataSet),1:len(excelDataSet.columns)-1]
-    outputTest= np.array(excelDataSet)[7298:len(excelDataSet),len(excelDataSet.columns)-1]
+    dataTrain=np.array(excelDataSet)[0:7296,1:len(excelDataSet.columns)-1]
+    outputTrain=np.array(excelDataSet)[0:7296,len(excelDataSet.columns)-1]
+    dataTest=np.array(excelDataSet)[7296:len(excelDataSet),1:len(excelDataSet.columns)-1]
+    outputTest= np.array(excelDataSet)[7296:len(excelDataSet),len(excelDataSet.columns)-1]
 
     # 7days ago
     outTrain7=np.array(outputTrain)[168:len(outputTrain)]
     inOutlessTrain7=np.array(outputTrain)[0:len(outputTrain)-168]
 
+    outTest7=np.array(outputTest)[168:len(outputTest)]
+    dataTest7=np.array(outputTest)[0:len(outputTest)-168]
+    
+
     # 7days ago and best Cross Correlation
     bestCorr=np.array(dataTrain)[0:len(outputTrain)-168,1]
     bestCorrTrain7=np.column_stack((bestCorr,inOutlessTrain7))
+
+    bestCorr=np.array(dataTest)[0:len(dataTest)-168,1]
+    bestCorrdataTest7=np.column_stack((bestCorr,dataTest7))
+
     
     
-    return Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7.reshape(1,-1),bestCorrTrain7,outTrain7
+    return Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7.reshape(-1,1),bestCorrTrain7,outTrain7,dataTest7.reshape(-1,1),bestCorrdataTest7,outTest7
 
 def clusterHAlgorithm(data,dataLink,numCluster,strMethod):
     C=fcluster(dataLink,numCluster,'maxclust')
@@ -193,7 +214,6 @@ def fuzzyCmeansAlgorithm(data,dataL,numCluster,strMethod):
     
 def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #LINEAR REGRESSION
-    print ('Linear Regression')
     LR_mdl=LinearRegression() 
     LR_mdl.fit (dataTrain,outputTrain) 
     Y_pred_LR=LR_mdl.predict (dataTrain) 
@@ -205,7 +225,6 @@ def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):
 
 def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #Polynomial REGRESSION
-    print ('Polynomial Regression')
     poly_features=PolynomialFeatures(degree=2)
     Inputs_poly=poly_features.fit_transform(dataTrain)
     Inputs_Test_poly=poly_features.fit_transform(dataTest)
@@ -220,8 +239,7 @@ def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):
 
 def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #ANN REGRESSION
-    print ('ANN Regression')
-    ANN_mdl=MLPRegressor (hidden_layer_sizes = 1, activation ='identity', max_iter=1000000, verbose = 'True',tol=1e-10, early_stopping=False, validation_fraction=0.2)
+    ANN_mdl=MLPRegressor (hidden_layer_sizes = 1, activation ='identity', max_iter=1000000, verbose = 'False',tol=1e-10, early_stopping=False, validation_fraction=0.2)
     ANN_mdl.fit(dataTrain,outputTrain)
     Y_pred_ANN=ANN_mdl.predict(dataTrain)
     Y_pred_Test_ANN=ANN_mdl.predict(dataTest)
@@ -231,8 +249,7 @@ def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest):
 
 def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #SVM REGRESSION
-    print ('SVM Regression')
-    SVR_mdl= SVR (C=5,kernel='linear',epsilon=0.005)
+    SVR_mdl= SVR (C=5,kernel='rbf',epsilon=0.005)
     SVR_mdl =SVR_mdl.fit(dataTrain,outputTrain)
     Y_pred_SVR=SVR_mdl.predict(dataTrain)
     Y_pred_Test_SVR=SVR_mdl.predict(dataTest)
@@ -267,13 +284,14 @@ def evaluateErrorMetric(outputTest,Y_pred_Test):
     MAPE_regression_Test=np.mean(Percentual_Errors_regression)
     return MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test
 
-def BOXPLOTAnalysis(outputTrain,Y_pred_regression,Errors_regression_Test):  
+def BOXPLOTAnalysis(outputTrain,Y_pred_regression,Errors_regression_Test,title):  
 # BOXPLOT Analysis
     Errors_regression_Train=np.subtract(outputTrain,Y_pred_regression)
     Errors_regression=np.concatenate((Errors_regression_Train,Errors_regression_Test))
     fig, axs = plt.subplots()
-    axs.boxplot(Errors_regression)
-    axs.set_title('Error Basic plot')
+    #axs.boxplot([Errors_regression,Errors_regression])
+    #axs.boxplot(Errors_regression)
+    axs.set_title("Error Basic plot\n"+title)
     plt.show(block=False)
 
 
