@@ -31,14 +31,21 @@ def readArgs():
     return args.d.split(" "),args.c,args.a,args.rmt,args.deg,args.nn
 
 
+def runRun(dataTrain,dataTest,outputTrain,outputTest):
+    [Y_pred,Y_pred_Test]=regressionMtd[rmt](dataTrain,dataTest,outputTrain,outputTest)
+    [MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test]=evaluateErrorMetric(outputTest,Y_pred_Test)
+    print("EVALUATE ERROR METRICS","\nMAE",MAE_regression_Test,"\nMSE:",MSE_regression_Test,"\nRMSE:",RMSE_regression_Test,"\nSSE:",SSE_regression_Test,"\nMAPE:",MAPE_regression_Test,"\n")
+    BOXPLOTAnalysis(outputTrain,Y_pred,Errors_regression_Test)
+
+
 [[datasetpath,numSkipedRow,sheetname],cmpMissData,adaptData,rmt,polynomialDegree,numNeurons]=readArgs()
 #strMethod=", "+normStr[adaptData]+", Num clusters= "+str(numCluster)+", distMethod="+distanceMethod+", linkMethod="+linkageMethod
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
-[Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest]=divideExcelData(dataset,cmpMissData)
-[Y_pred,Y_pred_Test]=regressionMtd[rmt](dataTrain,dataTest,outputTrain,outputTest)
-[MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test]=evaluateErrorMetric(outputTest,Y_pred_Test)
-print("EVALUATE ERROR METRICS","\nMAE",MAE_regression_Test,"\nMSE:",MSE_regression_Test,"\nRMSE:",RMSE_regression_Test,"\nSSE:",SSE_regression_Test,"\nMAPE:",MAPE_regression_Test,"\n")
-BOXPLOTAnalysis(outputTrain,Y_pred,Errors_regression_Test)
+[Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7,bestCorrTrain7,outTrain7]=divideExcelData(dataset,cmpMissData)
+
+runRun(dataTrain,dataTest,outputTrain,outputTest)
+runRun(inOutlessTrain7,outTrain7,outputTrain,outputTest)
+runRun(bestCorrTrain7,outTrain7,outputTrain,outputTest)
 
 plt.show()
 

@@ -88,7 +88,7 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
     return excelDataSet.columns.values,data,dataDist,dataLink
 
 def divideExcelData(excelDataSet,cmpMissData=1):
-    #1Novembro 7298 --> 31 Dezembro fim dados
+
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
     Inputs=np.array(excelDataSet)[:,1:len(excelDataSet.columns)-1]
     Outputs=np.array(excelDataSet)[:,len(excelDataSet.columns)-1]
@@ -102,15 +102,22 @@ def divideExcelData(excelDataSet,cmpMissData=1):
     plot_acf(Outputs.astype(float), lags=400) 
     plt.show(block=False)
 
+    #1Novembro 7298 --> 31 Dezembro fim dados
     dataTrain=np.array(excelDataSet)[0:7289,1:len(excelDataSet.columns)-1]
     outputTrain=np.array(excelDataSet)[0:7289,len(excelDataSet.columns)-1]
     dataTest=np.array(excelDataSet)[7298:len(excelDataSet),1:len(excelDataSet.columns)-1]
     outputTest= np.array(excelDataSet)[7298:len(excelDataSet),len(excelDataSet.columns)-1]
 
+    # 7days ago
+    outTrain7=np.array(outputTrain)[168:len(outputTrain)]
+    inOutlessTrain7=np.array(outputTrain)[0:len(outputTrain)-168]
 
+    # 7days ago and best Cross Correlation
+    bestCorr=np.array(dataTrain)[0:len(outputTrain)-168,1]
+    bestCorrTrain7=np.column_stack((bestCorr,inOutlessTrain7))
     
     
-    return Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest
+    return Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7.reshape(1,-1),bestCorrTrain7,outTrain7
 
 def clusterHAlgorithm(data,dataLink,numCluster,strMethod):
     C=fcluster(dataLink,numCluster,'maxclust')
