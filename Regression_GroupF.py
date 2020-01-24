@@ -42,7 +42,7 @@ def runRun(dataTrain,dataTest,outputTrain,outputTest,rmt,mode):
     Errors_regression_Train=np.subtract(outputTrain,Y_pred)
     Errors_regression=np.concatenate((Errors_regression_Train,Errors_regression_Test))
     plotFunction(plt.boxplot,Errors_regression,0,'bx-',title=str(operationMode[rmt]+"-"+mode), ylabel='Errors',xlabel='Test')
-    writeLogs("ERROR METRICS-"+operationMode[rmt]+".txt",3,[str(MAE_regression_Test),str(MSE_regression_Test),str(RMSE_regression_Test)],["MAE","MSE","RMSE"],operationMode[rmt],mode)
+    writeLogs("ERROR METRICS-"+operationMode[rmt]+".txt",3,[str(MAE_regression_Test),str(MSE_regression_Test),str(RMSE_regression_Test),str(SSE_regression_Test),str(MAPE_regression_Test)],["MAE","MSE","RMSE","SSE","MAPE"],operationMode[rmt]+"EVALUATE ERROR METRICS",mode)
     return Errors_regression.reshape(-1,1)
    
 lastErrors_regression={}

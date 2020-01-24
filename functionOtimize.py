@@ -228,13 +228,12 @@ def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     poly_features=PolynomialFeatures(degree=2)
     Inputs_poly=poly_features.fit_transform(dataTrain)
     Inputs_Test_poly=poly_features.fit_transform(dataTest)
-
     PR_mdl=LinearRegression()
     PR_mdl.fit(Inputs_poly,outputTrain)
     Y_pred_PR=PR_mdl.predict(Inputs_poly)
     Y_pred_Test_PR=PR_mdl.predict(Inputs_Test_poly)
-    print (PR_mdl.coef_)
-    print (PR_mdl.intercept_)
+    #print (PR_mdl.coef_)
+    #print (PR_mdl.intercept_)
     return Y_pred_PR,Y_pred_Test_PR  
 
 def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
@@ -243,8 +242,8 @@ def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     ANN_mdl.fit(dataTrain,outputTrain)
     Y_pred_ANN=ANN_mdl.predict(dataTrain)
     Y_pred_Test_ANN=ANN_mdl.predict(dataTest)
-    print (ANN_mdl.coefs_)
-    print (ANN_mdl.intercepts_)
+    #print (ANN_mdl.coefs_)
+    #print (ANN_mdl.intercepts_)
     return Y_pred_ANN,Y_pred_Test_ANN 
 
 def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
@@ -255,7 +254,7 @@ def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     Y_pred_Test_SVR=SVR_mdl.predict(dataTest)
     indexes_SVR=SVR_mdl.support_
     sv=SVR_mdl.support_vectors_
-    print(SVR_mdl.dual_coef_)
+    #print(SVR_mdl.dual_coef_)
     return Y_pred_SVR,Y_pred_Test_SVR 
 
 def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
