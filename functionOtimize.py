@@ -17,6 +17,7 @@ from sklearn.svm import SVR
 from sklearn.metrics import mean_absolute_error, mean_squared_error 
 from sklearn.model_selection import GridSearchCV
 from statsmodels.graphics.tsaplots import plot_acf
+import os
 
 
 normalizeMtd=[preprocessing.StandardScaler().fit_transform,preprocessing.MinMaxScaler().fit_transform]
@@ -283,19 +284,24 @@ def evaluateErrorMetric(outputTest,Y_pred_Test):
     MAPE_regression_Test=np.mean(Percentual_Errors_regression)
     return MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test
 
-def BOXPLOTAnalysis(outputTrain,Y_pred_regression,Errors_regression_Test,title):  
-# BOXPLOT Analysis
-    Errors_regression_Train=np.subtract(outputTrain,Y_pred_regression)
-    Errors_regression=np.concatenate((Errors_regression_Train,Errors_regression_Test))
-    fig, axs = plt.subplots()
-    #axs.boxplot([Errors_regression,Errors_regression])
-    #axs.boxplot(Errors_regression)
-    axs.set_title("Error Basic plot\n"+title)
-    plt.show(block=False)
 
+def writeLogs(fileName,numObgjW,listStr,listStrTitle,Title,subTitle):
+    if os.path.exists(fileName):
+      append_write = 'a' 
+    else:
+     append_write = 'w'
+    file1 = open(fileName,append_write) 
+    if append_write =='w':
+        file1.write("====="+Title+"=====\n")
+    file1.write("====="+subTitle+"=====")
+    for i in range(0,numObgjW):
+        file1.write("\n====="+listStrTitle[i]+"=====\n")
+        file1.write(listStr[i])
+    file1.write("\n\n")
+    file1.close()
 
 def writeLog(fileName,numObgjW,listStr,listStrTitle):
-    file1 = open(fileName,"w") 
+    file1 = open(fileName,'w') 
     for i in range(0,numObgjW):
         file1.write("\n====="+listStrTitle[i]+"=====\n")
         file1.write(listStr[i])
