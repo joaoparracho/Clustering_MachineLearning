@@ -2,7 +2,7 @@ from functionOtimize import *
 import argparse
 import itertools
 regressionMtd=[linearRegressionF,PolynomialRegressionF,ANNRegressionF,SVMRegressionF,SVMGridSearchRegressionF]
-operationMode=["Linear Regression","Polynomial Regression","ANN Regression","SVM Regression"] #,"SVM GridSearch Regression"
+operationMode=["Linear Regression","Polynomial Regression","ANN Regression","SVM Regression","SVM GridSearch Regression"]
 mode=["Mode 1","Mode 2","Mode 3"]
 
 def readArgs():
@@ -49,17 +49,15 @@ def runRun(dataTrain,dataTest,outputTrain,outputTest,rmt,mode):
    
 lastErrors_regression={}
 [[datasetpath,numSkipedRow,sheetname],cmpMissData,adaptData,rmt,polynomialDegree,numNeurons]=readArgs()
-#strMethod=", "+normStr[adaptData]+", Num clusters= "+str(numCluster)+", distMethod="+distanceMethod+", linkMethod="+linkageMethod
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
 [Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7,bestCorrTrain7,outTrain7,dataTest7,bestCorrdataTest7,outTest7]=divideExcelData(dataset,cmpMissData)
 
-for x in range(0, 4): #4
+for x in range(0, 5): 
     lastErrors_regression[(x*3)]=runRun(dataTrain,dataTest,outputTrain,outputTest,x,"Modo1")
     lastErrors_regression[(x*3)+1]=runRun(bestCorrTrain7,bestCorrdataTest7,outTrain7,outTest7,x,"Modo2")
     lastErrors_regression[(x*3)+2]=runRun(inOutlessTrain7,dataTest7,outTrain7,outTest7,x,"Mode3")
 
-#plotFunction(plt.boxplot,lastErrors_regression.values(),0, 'bx-',title="Error Boxplot", ylabel='Sum_of_squared_distances',xlabel='k')
-plotFunction(fancy_boxplot,lastErrors_regression.values(),0,'bx-',title="Error Boxplot", ylabel='Errors',xlabel='Test',facecolor=["green","green","green","blue","blue","blue","red","red","red","purple","purple","purple"],labels=list(itertools.product(operationMode, mode)))
-plt.show()
+plotFunction(fancy_boxplot,lastErrors_regression.values(),0,'bx-',title="Error Boxplot", ylabel='Errors',xlabel='Test',facecolor=randomColor(len(regressionMtd),len(mode)),labels=list(itertools.product(operationMode, mode)))
+
 
 

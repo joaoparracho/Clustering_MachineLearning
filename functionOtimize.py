@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt
 import skfuzzy  as  fuzz
+import random
 from scipy.spatial.distance import pdist,squareform #funções pdist e square form deve ser obtidas a partir do package scipy.spatial.distance
 from scipy.cluster.hierarchy import dendrogram, linkage,fcluster
 from sklearn.cluster import KMeans
@@ -57,8 +58,14 @@ def fancy_boxplot(*args, **kwargs):
         plt.setp(boxes["boxes"][x],color=facecolor[x])
         plt.setp(boxes["fliers"][x], markeredgecolor=facecolor[x])
     plt.legend(boxes["boxes"], labels,loc='upper center', bbox_to_anchor=(0.5, -0.05),
-          fancybox=True, shadow=True, ncol=int(len(boxes["boxes"])/3))     
-      
+          fancybox=True, shadow=True, ncol=int(len(boxes["boxes"])/3))  
+
+def randomColor(sizeRegressionMtd,sizeMode):
+    number_of_colors = sizeRegressionMtd
+    color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+             for i in range(number_of_colors)]
+    colors=np.repeat(color, sizeMode)
+    return colors    
 
 def plotFunction(function,*positionalParm,**keyParam):
     plt.figure(figsize=(20.0, 12.0))
@@ -99,7 +106,6 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
     return excelDataSet.columns.values,data,dataDist,dataLink
 
 def divideExcelData(excelDataSet,cmpMissData=1):
-
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
     Inputs=np.array(excelDataSet)[:,1:len(excelDataSet.columns)-1]
     Outputs=np.array(excelDataSet)[:,len(excelDataSet.columns)-1]
@@ -111,33 +117,26 @@ def divideExcelData(excelDataSet,cmpMissData=1):
         print(np.corrcoef(Inputs[:,x].astype(float),Outputs.astype(float)))
     
     print('\n')  
-    # Autocorrelation of Output --> segundo a autocorrelação a "periodo" de repetição é de 168/24=7dias 
-    plot_acf(Outputs.astype(float), lags=400) 
-    plt.show(block=False)
+    # Autocorrelation of Output --> segundo a autocorrelação a "periodo" de repetição é de 169/24=7dias 
+    plot_acf(Outputs.astype(float), lags=200)
+    plt.savefig('figures/'+'Autocorrelation'+'.png',bbox_inches='tight')  
+    plt.close() 
 
     #1Novembro 7298 --> 31 Dezembro fim dados
     dataTrain=np.array(excelDataSet)[0:7296,1:len(excelDataSet.columns)-1]
     outputTrain=np.array(excelDataSet)[0:7296,len(excelDataSet.columns)-1]
     dataTest=np.array(excelDataSet)[7296:len(excelDataSet),1:len(excelDataSet.columns)-1]
     outputTest= np.array(excelDataSet)[7296:len(excelDataSet),len(excelDataSet.columns)-1]
-
     # 7days ago
     outTrain7=np.array(outputTrain)[168:len(outputTrain)]
     inOutlessTrain7=np.array(outputTrain)[0:len(outputTrain)-168]
-
     outTest7=np.array(outputTest)[168:len(outputTest)]
     dataTest7=np.array(outputTest)[0:len(outputTest)-168]
-    
-
     # 7days ago and best Cross Correlation
     bestCorr=np.array(dataTrain)[0:len(outputTrain)-168,1]
     bestCorrTrain7=np.column_stack((bestCorr,inOutlessTrain7))
-
     bestCorr=np.array(dataTest)[0:len(dataTest)-168,1]
     bestCorrdataTest7=np.column_stack((bestCorr,dataTest7))
-
-    
-    
     return Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7.reshape(-1,1),bestCorrTrain7,outTrain7,dataTest7.reshape(-1,1),bestCorrdataTest7,outTest7
 
 def clusterHAlgorithm(data,dataLink,numCluster,strMethod):
@@ -260,7 +259,7 @@ def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest):
 
 def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #SVR REGRESSION with GridSearch
-    find_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],'C': [1, 10, 100, 1000] , 'epsilon': [0.01, 0.05, 0.1, 0.5]},{'kernel': ['linear'], 'C': [1, 10, 100, 1000] , 'epsilon': [0.01, 0.05, 0.1, 0.5]} ]
+    find_parameters=[{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],'C': [1, 10]}]
     SVR_mdl=GridSearchCV(SVR(),find_parameters,cv=3)
     SVR_mdl.fit(dataTrain,outputTrain)
     SVR_mdl.best_params_
