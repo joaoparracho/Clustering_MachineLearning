@@ -42,7 +42,7 @@ def runRun(dataTrain,dataTest,outputTrain,outputTest,rmt,mode):
     Errors_regression_Train=np.subtract(outputTrain,Y_pred)
     Errors_regression=np.concatenate((Errors_regression_Train,Errors_regression_Test))
     plotFunction(plt.boxplot,Errors_regression,0,'bx-',title=str(operationMode[rmt]+"-"+mode), ylabel='Errors',xlabel='Test')
-    writeLogs("ERROR METRICS-"+operationMode[rmt]+".txt",3,[str(MAE_regression_Test),str(MSE_regression_Test),str(RMSE_regression_Test),str(SSE_regression_Test),str(MAPE_regression_Test)],["MAE","MSE","RMSE","SSE","MAPE"],operationMode[rmt]+"EVALUATE ERROR METRICS",mode)
+    writeLogs("ERROR METRICS-"+operationMode[rmt]+".txt",3,[str(MAE_regression_Test),str(MSE_regression_Test),str(RMSE_regression_Test),str(SSE_regression_Test),str(MAPE_regression_Test)],["MAE","MSE","RMSE","SSE","MAPE"],"EVALUATE ERROR METRICS\n"+operationMode[rmt],mode)
     return Errors_regression.reshape(-1,1)
    
 lastErrors_regression={}
@@ -51,7 +51,7 @@ dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
 [Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7,bestCorrTrain7,outTrain7,dataTest7,bestCorrdataTest7,outTest7]=divideExcelData(dataset,cmpMissData)
 for x in range(0,len(regressionMtd)):
     try:
-        os.remove("ERROR METRICS-"+operationMode[rmt]+".txt")
+        os.remove("ERROR METRICS-"+operationMode[x]+".txt")
     except:
         pass
            
@@ -61,6 +61,6 @@ for x in range(0, len(regressionMtd)):
     lastErrors_regression[(x*3)+2]=runRun(inOutlessTrain7,dataTest7,outTrain7,outTest7,x,"Mode3")
 
 plotFunction(fancy_boxplot,lastErrors_regression.values(),0,'bx-',title="Error Boxplot", ylabel='Errors',xlabel='Test',facecolor=randomColor(len(regressionMtd),len(mode)),labels=list(itertools.product(operationMode, mode)))
-
+print("HEY")
 
 

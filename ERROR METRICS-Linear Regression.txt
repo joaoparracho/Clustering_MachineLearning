@@ -1,4 +1,5 @@
-=====Linear RegressionEVALUATE ERROR METRICS=====
+=====EVALUATE ERROR METRICS
+Linear Regression=====
 =====Modo1=====
 =====MAE=====
 5.04872105451683
