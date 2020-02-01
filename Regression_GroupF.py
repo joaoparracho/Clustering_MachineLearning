@@ -1,3 +1,4 @@
+#%%
 from functionOtimize import *
 import argparse
 regressionMtd=[linearRegressionF,PolynomialRegressionF,ANNRegressionF,SVMRegressionF,SVMGridSearchRegressionF]
@@ -32,4 +33,6 @@ def readArgs():
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
 [dataTrain,dataTest,outputTrain,outputTest]=divideExcelData(dataset,cmpMissData,trainP)
 regressionMtd[rmt](dataTrain[:,4:7],dataTest[:,4:7],outputTrain,outputTest)
-print("Here fir ")
+
+
+# %%

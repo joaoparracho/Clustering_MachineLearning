@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt
 import skfuzzy  as  fuzz
+import plotly.express as px
 from scipy.spatial.distance import pdist,squareform #funções pdist e square form deve ser obtidas a partir do package scipy.spatial.distance
 from scipy.cluster.hierarchy import dendrogram, linkage,fcluster
 from sklearn.cluster import KMeans
@@ -11,15 +12,12 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
-<<<<<<< HEAD
 from sklearn.metrics import mean_absolute_error, mean_squared_error 
 #git reset --hard
-=======
 from sklearn.neural_network import MLPRegressor
 from sklearn.svm import SVR
-from sklearn.metrics import mean_absolute_error, mean_squared_error 
 from sklearn.model_selection import GridSearchCV
->>>>>>> 35f866d1923e4222691ff7c456dd8830e59873c1
+from mpl_toolkits.mplot3d import Axes3D
 
 normalizeMtd=[preprocessing.StandardScaler().fit_transform,preprocessing.MinMaxScaler().fit_transform]
 
@@ -76,6 +74,18 @@ def plotBiDispersidade(data,cluster,i,centroids=[],title="scatter"):
     plt.savefig('figures/'+ title +'.png',bbox_inches='tight')  
     plt.close()
 
+def plot3Dispersidade(data3D,cluster,centroids=[],title="3Dscatter"):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(data3D[:,0], data3D[:,1], data3D[:,2], c=cluster,cmap='viridis', marker='o')
+    if len(centroids)>0:
+        ax.scatter(centroids[:,0],centroids[:,1],centroids[:,2],c='black',s=200,alpha=0.5)
+    ax.set_xlabel('Feature X')
+    ax.set_ylabel('Feature Y')
+    ax.set_zlabel('Feature Z')
+
+    plt.show()
+    
 def readExcel(excelPath,numSkipedRow=0,sheetName="Clustering"):
     return pd.read_excel(excelPath,sheetName,skiprows=numSkipedRow)
 
@@ -100,6 +110,18 @@ def divideExcelData(excelDataSet,cmpMissData=1,trainP=0.7):
 
     return dataTrain,dataTest,outputTrain,outputTest
 
+def treeDscatterData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="euclidean",linkageMethod="average"):
+    excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
+    data=(np.array(excelDataSet.values)[:,1:])
+    data3D=data
+    data3D[:,0]=data[:,0]/data[:,1]
+    data3D[:,1]=data[:,2]/data[:,3]
+    data3D[:,2]=data[:,4]/data[:,5]
+    data3D=normalizeMtd[adaptData](data3D[:,0:3])
+    dataDist=pdist(data3D,distanceMethod)
+    dataLink=linkage(data3D,linkageMethod)
+    return data3D,dataLink
+
 def clusterHAlgorithm(data,dataLink,numCluster,strMethod):
     C=fcluster(dataLink,numCluster,'maxclust')
     centroids=np.zeros([numCluster,len(data[0])])
@@ -111,12 +133,10 @@ def clusterHAlgorithm(data,dataLink,numCluster,strMethod):
     writeLog("logs/ClusterHierq"+strMethod+".txt",3,[str(C),str(centroids),str(numObjCluster)],
     ["C","centroids","numObjCluster"])
 
-    for i in range(0,len(data[0]),2):
-        plotBiDispersidade(data,C,i,centroids,title="Cluster_Feature "+str(i)+" with Feature " +str(i+1) + strMethod)
-
-    plotBar(numObjCluster.astype(int),title='Cluster_Number of objects per Cluster' + strMethod, 
-    ylabel='Number of Object',xlabel='Cluster Index',xIndex=len(numObjCluster))
+    plotBar(numObjCluster.astype(int),title='Cluster_Number of objects per Cluster' + strMethod,ylabel='Number of Object',xlabel='Cluster Index',xIndex=len(numObjCluster))
     
+    return C,centroids
+
 def kMeansAlgorithm(data,dataLink,numCluster,strMethod):
     
     Sum_of_squared_distances  =  []
@@ -134,29 +154,27 @@ def kMeansAlgorithm(data,dataLink,numCluster,strMethod):
     centroids=km.cluster_centers_
 
     plotFunction(plt.plot,range(2,numCluster+8),Sum_of_squared_distances, 'bx-',title='Elbow Method For Optimal k '+strMethod, ylabel='Sum_of_squared_distances',xlabel='k')
-    
-    for i in range(0,len(data[0]),2):
-        plotBiDispersidade(data, km.predict(data),i,centroids,"Kmeans_Feature "+str(i)+" with Feature " +str(i+1)+strMethod)
-           
-    numObjCluster=np.zeros([km.predict(data).max()+1])
+    C=km.predict(data)   
 
-    for k in range(0,km.predict(data).max()+1):
+    numObjCluster=np.zeros([C.max()+1])
+
+    for k in range(0,C.max()+1):
         numObjCluster[k]=(km.predict(data)==k).sum()
 
-    writeLog("logs/kMeans"+strMethod+".txt",6,[str(km.predict(data)),str(centroids),str(numObjCluster),str(Sum_of_squared_distances[numCluster-2]),str(silhouette_avg),str(silhouette_values)],
+    writeLog("logs/kMeans"+strMethod+".txt",6,[str(C),str(centroids),str(numObjCluster),str(Sum_of_squared_distances[numCluster-2]),str(silhouette_avg),str(silhouette_values)],
     ["C","centroids","numObjCluster","Sum_of_squared_distances","silhouette_avg","silhouette_values"])
 
     plotBar(numObjCluster.astype(int),title='Kmeans_Number of objects per Cluster'+strMethod, 
     ylabel='Number of Object',xlabel='Cluster Index',xIndex=len(numObjCluster))
+
+    return C,centroids
 
 def fuzzyCmeansAlgorithm(data,dataL,numCluster,strMethod):
     fpcs = []
     centroids, membershipDeg, u0, d, ObjFunction, p, fpc = fuzz.cluster.cmeans(data.T, numCluster, 2, error=0.005,maxiter=1000, init=None)
     cluster_membership = np.argmax(membershipDeg, axis=0)
     fpcs.append(fpc)
-    for i in range(0,len(data[0]),2):
-        plotBiDispersidade(data, cluster_membership,i,centroids,"FuzzyCmeans_Feature "+str(i)+" with Feature " +str(i+1)+strMethod+", FPC="+str(fpcs))
-    
+
     numObjCluster=np.zeros([numCluster])
     for k in range(0,numCluster):
         numObjCluster[k]=(cluster_membership==k).sum()
@@ -172,6 +190,8 @@ def fuzzyCmeansAlgorithm(data,dataL,numCluster,strMethod):
     plotBar(numObjCluster.astype(int),title='FuzzyCmeans_Number of objects per CLuster'+strMethod, 
     ylabel='Number of Object',xlabel='Cluster Index',xIndex=len(numObjCluster))
     
+    return C,cluster_membership
+
 def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
     #LINEAR REGRESSION
     print ('Linear Regression')
@@ -231,10 +251,7 @@ def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     Y_pred_Test_SVR=SVR_mdl.predict(dataTest)
 
 def evaluateErrorMetric(outputTest,Y_pred_Test):
-<<<<<<< HEAD
-=======
     #EVALUATE ERROR METRICS
->>>>>>> 35f866d1923e4222691ff7c456dd8830e59873c1
     # MAE Calculus
     MAE_regression_Test=mean_absolute_error(outputTest,Y_pred_Test)
     # MSE Calculus
