@@ -212,7 +212,7 @@ def fuzzyCmeansAlgorithm(data,dataL,numCluster,strMethod):
     plotBar(numObjCluster.astype(int),title='FuzzyCmeans_Number of objects per CLuster'+strMethod, 
     ylabel='Number of Object',xlabel='Cluster Index',xIndex=len(numObjCluster))
     
-def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest,*_):  
     #LINEAR REGRESSION
     LR_mdl=LinearRegression() 
     LR_mdl.fit (dataTrain,outputTrain) 
@@ -223,9 +223,9 @@ def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     return Y_pred_LR,Y_pred_Test_LR
 
 
-def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest,degree,*_):  
     #Polynomial REGRESSION
-    poly_features=PolynomialFeatures(degree=2)
+    poly_features=PolynomialFeatures(degree)
     Inputs_poly=poly_features.fit_transform(dataTrain)
     Inputs_Test_poly=poly_features.fit_transform(dataTest)
     PR_mdl=LinearRegression()
@@ -236,9 +236,9 @@ def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     #print (PR_mdl.intercept_)
     return Y_pred_PR,Y_pred_Test_PR  
 
-def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest,deg,nn,act,val,*_):  
     #ANN REGRESSION
-    ANN_mdl=MLPRegressor (hidden_layer_sizes = 1, activation ='identity', max_iter=1000000, verbose = 'False',tol=1e-10, early_stopping=False, validation_fraction=0.2)
+    ANN_mdl=MLPRegressor (hidden_layer_sizes = nn, activation =act, max_iter=1000000, verbose = 'False',tol=1e-10, early_stopping=False, validation_fraction=val)
     ANN_mdl.fit(dataTrain,outputTrain)
     Y_pred_ANN=ANN_mdl.predict(dataTrain)
     Y_pred_Test_ANN=ANN_mdl.predict(dataTest)
@@ -246,9 +246,9 @@ def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     #print (ANN_mdl.intercepts_)
     return Y_pred_ANN,Y_pred_Test_ANN 
 
-def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest,deg,nn,act,val,c,k,ep,*_):  
     #SVM REGRESSION
-    SVR_mdl= SVR (C=5,kernel='rbf',epsilon=0.005)
+    SVR_mdl= SVR (C=c,kernel=k,epsilon=ep)
     SVR_mdl =SVR_mdl.fit(dataTrain,outputTrain)
     Y_pred_SVR=SVR_mdl.predict(dataTrain)
     Y_pred_Test_SVR=SVR_mdl.predict(dataTest)
@@ -257,7 +257,7 @@ def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest):
     #print(SVR_mdl.dual_coef_)
     return Y_pred_SVR,Y_pred_Test_SVR 
 
-def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest,*_):  
     #SVR REGRESSION with GridSearch
     find_parameters=[{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],'C': [1, 10]}]
     SVR_mdl=GridSearchCV(SVR(),find_parameters,cv=3)

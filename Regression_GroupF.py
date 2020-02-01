@@ -27,16 +27,20 @@ def readArgs():
     ANN: 2
     SVM 3
     SVMGridSearch 4''')
-    parser.add_argument('-deg' ,type=int,default=2,help
-    ="Polynomial degree ")
-    parser.add_argument('-nn' ,type=int,default=1,help="Number of neurons hidden_layer")
+    parser.add_argument('-deg' ,type=int,default=2,help="Polynomial degree")
+    parser.add_argument('-nn' ,type=int,default=1,help="Number of neurons hidden_layer ANN")
+    parser.add_argument('-activation',type=str,default='identity',help="Activation function ANN")
+    parser.add_argument('-validation_fraction', type=int,default=0.2,help="Validation Fraction ANN")
+    parser.add_argument('-cSVM',type=int,default=5,help="Regularization parameter SVM")
+    parser.add_argument('-kernel',type=str,default='rbf',help="Specifies the kernel type to be used in the algorithm linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed'SVM")
+    parser.add_argument('-epsilon',type=float,default=0.005,help="Epsilon in the epsilon-SVR model. It specifies the epsilon-tube within which no penalty is associated in the training loss function with points predicted within a distance epsilon from the actual value.")
 
     args = parser.parse_args()
-    return args.d.split(" "),args.c,args.a,args.rmt,args.deg,args.nn
+    return args.d.split(" "),args.c,args.a,args.rmt,args.deg,args.nn,args.activation,args.validation_fraction,args.cSVM,args.kernel,args.epsilon
 
 def runRun(dataTrain,dataTest,outputTrain,outputTest,rmt,mode):
     print(operationMode[rmt]+"-"+mode)
-    [Y_pred,Y_pred_Test]=regressionMtd[rmt](dataTrain,dataTest,outputTrain,outputTest)
+    [Y_pred,Y_pred_Test]=regressionMtd[rmt](dataTrain,dataTest,outputTrain,outputTest,deg,nn,activation,validation_fraction,c,kernel,epsilon)
     [MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test]=evaluateErrorMetric(outputTest,Y_pred_Test)
     #print("EVALUATE ERROR METRICS","\nMAE",MAE_regression_Test,"\nMSE:",MSE_regression_Test,"\nRMSE:",RMSE_regression_Test,"\nSSE:",SSE_regression_Test,"\nMAPE:",MAPE_regression_Test,"\n")
     Errors_regression_Train=np.subtract(outputTrain,Y_pred)
@@ -46,7 +50,7 @@ def runRun(dataTrain,dataTest,outputTrain,outputTest,rmt,mode):
     return Errors_regression.reshape(-1,1)
    
 lastErrors_regression={}
-[[datasetpath,numSkipedRow,sheetname],cmpMissData,adaptData,rmt,polynomialDegree,numNeurons]=readArgs()
+[[datasetpath,numSkipedRow,sheetname],cmpMissData,adaptData,rmt,deg,nn,activation,validation_fraction,c,kernel,epsilon]=readArgs()
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
 [Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7,bestCorrTrain7,outTrain7,dataTest7,bestCorrdataTest7,outTest7]=divideExcelData(dataset,cmpMissData)
 
