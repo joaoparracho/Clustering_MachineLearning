@@ -1,6 +1,9 @@
 from functionOtimize import *
 import argparse
 import itertools
+import time
+
+start_time = time.time()
 regressionMtd=[linearRegressionF,PolynomialRegressionF,ANNRegressionF,SVMRegressionF,SVMGridSearchRegressionF]
 operationMode=["Linear Regression","Polynomial Regression","ANN Regression","SVM Regression","SVM GridSearch Regression"]
 mode=["Mode 1","Mode 2","Mode 3"]
@@ -49,6 +52,8 @@ def runRun(dataTrain,dataTest,outputTrain,outputTest,rmt,mode):
     writeLogs("ERROR METRICS-"+operationMode[rmt]+".txt",3,[str(MAE_regression_Test),str(MSE_regression_Test),str(RMSE_regression_Test),str(SSE_regression_Test),str(MAPE_regression_Test)],["MAE","MSE","RMSE","SSE","MAPE"],"EVALUATE ERROR METRICS\n"+operationMode[rmt],mode)
     return Errors_regression.reshape(-1,1)
    
+
+
 lastErrors_regression={}
 [[datasetpath,numSkipedRow,sheetname],cmpMissData,adaptData,rmt,deg,nn,activation,validation_fraction,c,kernel,epsilon]=readArgs()
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
@@ -66,6 +71,7 @@ for x in range(0, len(regressionMtd)):
     lastErrors_regression[(x*3)+2]=runRun(inOutlessTrain7,dataTest7,outTrain7,outTest7,x,"Mode3")
 
 plotFunction(fancy_boxplot,lastErrors_regression.values(),0,'bx-',title="Error Boxplot", ylabel='Errors',xlabel='Test',facecolor=randomColor(len(regressionMtd),len(mode)),labels=list(itertools.product(operationMode, mode)))
-print("HEY")
+print("Execution Time")
+print("--- %.2d seconds ---" % (time.time() - start_time))
 
 
