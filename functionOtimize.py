@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import skfuzzy  as  fuzz
 import plotly.express as px
+import random
 from scipy.spatial.distance import pdist,squareform #funções pdist e square form deve ser obtidas a partir do package scipy.spatial.distance
 from scipy.cluster.hierarchy import dendrogram, linkage,fcluster
 from sklearn.cluster import KMeans
@@ -18,6 +19,9 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.svm import SVR
 from sklearn.model_selection import GridSearchCV
 from mpl_toolkits.mplot3d import Axes3D
+from statsmodels.graphics.tsaplots import plot_acf
+import os
+
 
 normalizeMtd=[preprocessing.StandardScaler().fit_transform,preprocessing.MinMaxScaler().fit_transform]
 
@@ -49,6 +53,23 @@ def fancy_dendrogram(*args, **kwargs):
     plt.axhline(y=max_d, c='k',linewidth=4,label='Cutoff line')
     plt.legend()
     dendrogram(*args, **kwargs)
+
+def fancy_boxplot(*args, **kwargs):
+    facecolor = kwargs.pop('facecolor', None)
+    labels = kwargs.pop('labels', None)
+    boxes=plt.boxplot(*args, **kwargs, patch_artist=True)
+    for x in range(0,len(boxes["boxes"])):
+        plt.setp(boxes["boxes"][x],color=facecolor[x])
+        plt.setp(boxes["fliers"][x], markeredgecolor=facecolor[x])
+    plt.legend(boxes["boxes"], labels,loc='upper center', bbox_to_anchor=(0.5, -0.05),
+          fancybox=True, shadow=True, ncol=int(len(boxes["boxes"])/3))  
+
+def randomColor(sizeRegressionMtd,sizeMode):
+    number_of_colors = sizeRegressionMtd
+    color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+             for i in range(number_of_colors)]
+    colors=np.repeat(color, sizeMode)
+    return colors    
 
 def plotFunction(function,*positionalParm,**keyParam):
     plt.figure(figsize=(20.0, 12.0))
@@ -100,15 +121,39 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
     print(squareform(dataDist))
     return excelDataSet.columns.values,data,dataDist,dataLink
 
-def divideExcelData(excelDataSet,cmpMissData=1,trainP=0.7):
-    trainSize=int(len(excelDataSet)*trainP+1)
+def divideExcelData(excelDataSet,cmpMissData=1):
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
-    dataTrain=np.array(excelDataSet)[0:trainSize,0:len(excelDataSet.columns)-1]
-    outputTrain=np.array(excelDataSet)[0:trainSize,len(excelDataSet.columns)-1]
-    dataTest=np.array(excelDataSet)[trainSize:len(excelDataSet),0:len(excelDataSet.columns)-1]
-    outputTest= np.array(excelDataSet)[trainSize:len(excelDataSet),len(excelDataSet.columns)-1]
+    Inputs=np.array(excelDataSet)[:,1:len(excelDataSet.columns)-1]
+    Outputs=np.array(excelDataSet)[:,len(excelDataSet.columns)-1]
+    # Cross Correlation and Auto Correlation Analysis
+    # Direct Normal Solar (kW) --> 0.53904677
+    # Occupancy Factor --> 0.8804244
+    # Wind Speed (m/s) --> 0.21149389
+    for x in range(0, 3):
+        print(np.corrcoef(Inputs[:,x].astype(float),Outputs.astype(float)))
+    
+    print('\n')  
+    # Autocorrelation of Output --> segundo a autocorrelação a "periodo" de repetição é de 169/24=7dias 
+    plot_acf(Outputs.astype(float), lags=200)
+    plt.savefig('figures/'+'Autocorrelation'+'.png',bbox_inches='tight')  
+    plt.close() 
 
-    return dataTrain,dataTest,outputTrain,outputTest
+    #1Novembro 7298 --> 31 Dezembro fim dados
+    dataTrain=np.array(excelDataSet)[0:7296,1:len(excelDataSet.columns)-1]
+    outputTrain=np.array(excelDataSet)[0:7296,len(excelDataSet.columns)-1]
+    dataTest=np.array(excelDataSet)[7296:len(excelDataSet),1:len(excelDataSet.columns)-1]
+    outputTest= np.array(excelDataSet)[7296:len(excelDataSet),len(excelDataSet.columns)-1]
+    # 7days ago
+    outTrain7=np.array(outputTrain)[168:len(outputTrain)]
+    inOutlessTrain7=np.array(outputTrain)[0:len(outputTrain)-168]
+    outTest7=np.array(outputTest)[168:len(outputTest)]
+    dataTest7=np.array(outputTest)[0:len(outputTest)-168]
+    # 7days ago and best Cross Correlation
+    bestCorr=np.array(dataTrain)[0:len(outputTrain)-168,1]
+    bestCorrTrain7=np.column_stack((bestCorr,inOutlessTrain7))
+    bestCorr=np.array(dataTest)[0:len(dataTest)-168,1]
+    bestCorrdataTest7=np.column_stack((bestCorr,dataTest7))
+    return Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7.reshape(-1,1),bestCorrTrain7,outTrain7,dataTest7.reshape(-1,1),bestCorrdataTest7,outTest7
 
 def treeDscatterData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="euclidean",linkageMethod="average"):
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
@@ -192,91 +237,96 @@ def fuzzyCmeansAlgorithm(data,dataL,numCluster,strMethod):
     
     return C,cluster_membership
 
-def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+#def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest,*_):  
     #LINEAR REGRESSION
-    print ('Linear Regression')
     LR_mdl=LinearRegression() 
     LR_mdl.fit (dataTrain,outputTrain) 
     Y_pred_LR=LR_mdl.predict (dataTrain) 
     Y_pred_Test_LR=LR_mdl.predict (dataTest) 
     print (LR_mdl.coef_)
     print (LR_mdl.intercept_)
-    [MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test]=evaluateErrorMetric(outputTest,Y_pred_Test_LR)
-    BOXPLOTAnalysis(outputTrain,Y_pred_LR,Errors_regression_Test)
+    return Y_pred_LR,Y_pred_Test_LR
 
-def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+
+def PolynomialRegressionF(dataTrain,dataTest,outputTrain,outputTest,degree,*_):  
     #Polynomial REGRESSION
-    print ('Polynomial Regression')
-    poly_features=PolynomialFeatures(degree=2)
+    poly_features=PolynomialFeatures(degree)
     Inputs_poly=poly_features.fit_transform(dataTrain)
     Inputs_Test_poly=poly_features.fit_transform(dataTest)
-
     PR_mdl=LinearRegression()
     PR_mdl.fit(Inputs_poly,outputTrain)
     Y_pred_PR=PR_mdl.predict(Inputs_poly)
     Y_pred_Test_PR=PR_mdl.predict(Inputs_Test_poly)
-    print (PR_mdl.coef_)
-    print (PR_mdl.intercept_)
-    [MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test]=evaluateErrorMetric(outputTest,Y_pred_Test_PR)
-    BOXPLOTAnalysis(outputTrain,Y_pred_PR,Errors_regression_Test)    
+    #print (PR_mdl.coef_)
+    #print (PR_mdl.intercept_)
+    return Y_pred_PR,Y_pred_Test_PR  
 
-def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+def ANNRegressionF(dataTrain,dataTest,outputTrain,outputTest,deg,nn,act,val,*_):  
     #ANN REGRESSION
-    print ('ANN Regression')
-    ANN_mdl=MLPRegressor (hidden_layer_sizes = 1, activation ='identity', max_iter=1000000, verbose = 'True',tol=1e-10, early_stopping=False, validation_fraction=0.2)
+    ANN_mdl=MLPRegressor (hidden_layer_sizes = nn, activation =act, max_iter=1000000, verbose = 'False',tol=1e-10, early_stopping=False, validation_fraction=val)
     ANN_mdl.fit(dataTrain,outputTrain)
     Y_pred_ANN=ANN_mdl.predict(dataTrain)
     Y_pred_Test_ANN=ANN_mdl.predict(dataTest)
-    print (ANN_mdl.coefs_)
-    print (ANN_mdl.intercepts_)
+    #print (ANN_mdl.coefs_)
+    #print (ANN_mdl.intercepts_)
+    return Y_pred_ANN,Y_pred_Test_ANN 
 
-def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+def SVMRegressionF(dataTrain,dataTest,outputTrain,outputTest,deg,nn,act,val,c,k,ep,*_):  
     #SVM REGRESSION
-    print ('SVM Regression')
-    SVR_mdl= SVR (C=5,kernel='linear',epsilon=0.005)
+    SVR_mdl= SVR (C=c,kernel=k,epsilon=ep)
     SVR_mdl =SVR_mdl.fit(dataTrain,outputTrain)
     Y_pred_SVR=SVR_mdl.predict(dataTrain)
     Y_pred_Test_SVR=SVR_mdl.predict(dataTest)
     indexes_SVR=SVR_mdl.support_
     sv=SVR_mdl.support_vectors_
-    print(SVR_mdl.dual_coef_)
+    #print(SVR_mdl.dual_coef_)
+    return Y_pred_SVR,Y_pred_Test_SVR 
 
-def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
+def SVMGridSearchRegressionF(dataTrain,dataTest,outputTrain,outputTest,*_):  
     #SVR REGRESSION with GridSearch
-    find_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],'C': [1, 10, 100, 1000] , 'epsilon': [0.01, 0.05, 0.1, 0.5]},{'kernel': ['linear'], 'C': [1, 10, 100, 1000] , 'epsilon': [0.01, 0.05, 0.1, 0.5]} ]
+    find_parameters=[{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],'C': [1, 10]}]
     SVR_mdl=GridSearchCV(SVR(),find_parameters,cv=3)
     SVR_mdl.fit(dataTrain,outputTrain)
     SVR_mdl.best_params_
     Y_pred_SVR=SVR_mdl.predict(dataTrain)
     Y_pred_Test_SVR=SVR_mdl.predict(dataTest)
+    return Y_pred_SVR,Y_pred_Test_SVR 
 
 def evaluateErrorMetric(outputTest,Y_pred_Test):
     #EVALUATE ERROR METRICS
-    # MAE Calculus
+    # Mean Absolute Error (MAE) – Erro Absoluto Médio
     MAE_regression_Test=mean_absolute_error(outputTest,Y_pred_Test)
-    # MSE Calculus
+    # Mean Squared Error (MSE) – Erro Quadrático Médio
     MSE_regression_Test=mean_squared_error(outputTest,Y_pred_Test)
-    # RMSE Calculus
+    # Root Mean Squared Error (RMSE) – Raíz Quadrada do Erro Quadrático Médio
     RMSE_regression_Test=np.sqrt(mean_squared_error(outputTest,Y_pred_Test))
-    # SSE Calculus
+    # Sum of Squared Errors (SSE) – Soma de Erros Quadráticos
     Errors_regression_Test=np.subtract(outputTest,Y_pred_Test)
     SSE_regression_Test=np.sum(Errors_regression_Test*Errors_regression_Test)
-    # MAPE Calculus
+    # Mean Absolute Percentage Error (MAPE) – Erro Percentual Absoluto Médio
     Percentual_Errors_regression=np.divide(np.abs(Errors_regression_Test),outputTest)
     MAPE_regression_Test=np.mean(Percentual_Errors_regression)
     return MAE_regression_Test,MSE_regression_Test,RMSE_regression_Test,Errors_regression_Test,SSE_regression_Test,MAPE_regression_Test
 
-def BOXPLOTAnalysis(outputTrain,Y_pred_regression,Errors_regression_Test):  
-# BOXPLOT Analysis
-    Errors_regression_Train=np.subtract(outputTrain,Y_pred_regression)
-    Errors_regression=np.concatenate((Errors_regression_Train,Errors_regression_Test))
-    fig1, ax1 = plt.subplots()
-    ax1.set_title('Basic Plot')
-    ax1.boxplot(Errors_regression)
-    plt.show()
+
+def writeLogs(fileName,numObgjW,listStr,listStrTitle,Title,subTitle):
+    if os.path.exists(fileName):
+      append_write = 'a' 
+    else:
+     append_write = 'w'
+    file1 = open(fileName,append_write) 
+    if append_write =='w':
+        file1.write("====="+Title+"=====\n")
+    file1.write("====="+subTitle+"=====")
+    for i in range(0,numObgjW):
+        file1.write("\n====="+listStrTitle[i]+"=====\n")
+        file1.write(listStr[i])
+    file1.write("\n\n")
+    file1.close()
 
 def writeLog(fileName,numObgjW,listStr,listStrTitle):
-    file1 = open(fileName,"w") 
+    file1 = open(fileName,'w') 
     for i in range(0,numObgjW):
         file1.write("\n====="+listStrTitle[i]+"=====\n")
         file1.write(listStr[i])
