@@ -38,7 +38,6 @@ def readArgs():
     parser.add_argument('-cSVM',type=int,default=5,help="Regularization parameter SVM")
     parser.add_argument('-kernel',type=str,default='rbf',help="Specifies the kernel type to be used in the algorithm linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed'SVM")
     parser.add_argument('-epsilon',type=float,default=0.005,help="Epsilon in the epsilon-SVR model. It specifies the epsilon-tube within which no penalty is associated in the training loss function with points predicted within a distance epsilon from the actual value.")
-
     args = parser.parse_args()
     return args.d.split(" "),args.c,args.a,args.rmt,args.deg,args.nn,args.activation,args.validation_fraction,args.cSVM,args.kernel,args.epsilon
 
@@ -53,23 +52,13 @@ def runRun(dataTrain,dataTest,outputTrain,outputTest,rmt,mode,addtitleTxt):
     writeLogs("logs/ERROR METRICS-"+operationMode[rmt]+"-"+addtitleTxt+".txt",3,[str(MAE_regression_Test),str(MSE_regression_Test),str(RMSE_regression_Test),str(SSE_regression_Test),str(MAPE_regression_Test)],["MAE","MSE","RMSE","SSE","MAPE"],"EVALUATE ERROR METRICS\n"+operationMode[rmt],mode)
     return Errors_regression.reshape(-1,1)
    
-def switch(i):
-        switcher={
-                0:'',
-                1:"deg="+str(deg),
-                2:"nn="+str(nn)+" activation="+str(activation) +" validation_fraction="+str(validation_fraction),
-                3:"c="+str(c) + " kernel=" +str(kernel) + " epsilon="+str(epsilon),
-                4:'',
-             }
-        return switcher.get(i,"Invalid")
-
 lastErrors_regression={}
 [[datasetpath,numSkipedRow,sheetname],cmpMissData,adaptData,rmt,deg,nn,activation,validation_fraction,c,kernel,epsilon]=readArgs()
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
 [Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7,bestCorrTrain7,outTrain7,dataTest7,bestCorrdataTest7,outTest7]=divideExcelData(dataset,cmpMissData)
 
 for x in range(0, len(regressionMtd)):
-    addStrTitle=switch(x)
+    addStrTitle=switch(x,deg,nn,activation,validation_fraction,c,kernel,epsilon)
     lastErrors_regression[(x*3)]=runRun(dataTrain,dataTest,outputTrain,outputTest,x,"Mode1",addStrTitle)
     lastErrors_regression[(x*3)+1]=runRun(bestCorrTrain7,bestCorrdataTest7,outTrain7,outTest7,x,"Mode2",addStrTitle)
     lastErrors_regression[(x*3)+2]=runRun(inOutlessTrain7,dataTest7,outTrain7,outTest7,x,"Mode3",addStrTitle)
