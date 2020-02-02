@@ -68,12 +68,6 @@ lastErrors_regression={}
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
 [Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7,bestCorrTrain7,outTrain7,dataTest7,bestCorrdataTest7,outTest7]=divideExcelData(dataset,cmpMissData)
 
-""" for x in range(0,len(regressionMtd)):
-    try:
-        os.remove("ERROR METRICS-"+operationMode[x]+".txt")
-    except:
-        pass          
- """
 for x in range(0, len(regressionMtd)):
     addStrTitle="-"+switch(x)
     lastErrors_regression[(x*3)]=runRun(dataTrain,dataTest,outputTrain,outputTest,x,"Mode1",addStrTitle)
