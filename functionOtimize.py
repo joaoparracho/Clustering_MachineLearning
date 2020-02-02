@@ -121,7 +121,7 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
     print(squareform(dataDist))
     return excelDataSet.columns.values,data,dataDist,dataLink
 
-def divideExcelData(excelDataSet,addStrTitle,cmpMissData=1):
+def divideExcelData(excelDataSet,cmpMissData=1):
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
     Inputs=np.array(excelDataSet)[:,1:len(excelDataSet.columns)-1]
     Outputs=np.array(excelDataSet)[:,len(excelDataSet.columns)-1]
@@ -135,7 +135,7 @@ def divideExcelData(excelDataSet,addStrTitle,cmpMissData=1):
     print('\n')  
     # Autocorrelation of Output --> segundo a autocorrelação a "periodo" de repetição é de 169/24=7dias 
     plot_acf(Outputs.astype(float), lags=200)
-    plt.savefig("figures/Autocorrelation"+addStrTitle+".png",bbox_inches='tight')  
+    plt.savefig("figures/Autocorrelation.png",bbox_inches='tight')  
     plt.close() 
 
     #1Novembro 7298 --> 31 Dezembro fim dados

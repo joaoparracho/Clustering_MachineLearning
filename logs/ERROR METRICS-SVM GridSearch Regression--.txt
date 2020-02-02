@@ -1,6 +1,6 @@
 =====EVALUATE ERROR METRICS
 SVM GridSearch Regression=====
-=====Modo1=====
+=====Mode1=====
 =====MAE=====
 5.557294311351214
 =====MSE=====
@@ -8,7 +8,7 @@ SVM GridSearch Regression=====
 =====RMSE=====
 9.363839838111065
 
-=====Modo2=====
+=====Mode2=====
 =====MAE=====
 0.6294414487052552
 =====MSE=====

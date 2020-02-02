@@ -1,6 +1,6 @@
 =====EVALUATE ERROR METRICS
 Linear Regression=====
-=====Modo1=====
+=====Mode1=====
 =====MAE=====
 5.04872105451683
 =====MSE=====
@@ -8,7 +8,7 @@ Linear Regression=====
 =====RMSE=====
 7.655606908567947
 
-=====Modo2=====
+=====Mode2=====
 =====MAE=====
 0.8432292202206585
 =====MSE=====

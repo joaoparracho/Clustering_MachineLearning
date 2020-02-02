@@ -53,23 +53,31 @@ def runRun(dataTrain,dataTest,outputTrain,outputTest,rmt,mode,addtitleTxt):
     writeLogs("logs/ERROR METRICS-"+operationMode[rmt]+"-"+addtitleTxt+".txt",3,[str(MAE_regression_Test),str(MSE_regression_Test),str(RMSE_regression_Test),str(SSE_regression_Test),str(MAPE_regression_Test)],["MAE","MSE","RMSE","SSE","MAPE"],"EVALUATE ERROR METRICS\n"+operationMode[rmt],mode)
     return Errors_regression.reshape(-1,1)
    
-
+def switch(i):
+        switcher={
+                0:'',
+                1:"deg="+str(deg),
+                2:"nn="+str(nn)+" activation="+str(activation) +" validation_fraction="+str(validation_fraction),
+                3:"c="+str(c) + " kernel=" +str(kernel) + " epsilon="+str(epsilon),
+                4:'',
+             }
+        return switcher.get(i,"Invalid")
 
 lastErrors_regression={}
 [[datasetpath,numSkipedRow,sheetname],cmpMissData,adaptData,rmt,deg,nn,activation,validation_fraction,c,kernel,epsilon]=readArgs()
-addStrTitle="deg="+str(deg)+" nn="+str(nn)+" activation="+str(activation) +" validation_fraction="+str(validation_fraction)+" c="+str(c) + " kernel=" +str(kernel) + " epsilon="+str(epsilon)
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
-[Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7,bestCorrTrain7,outTrain7,dataTest7,bestCorrdataTest7,outTest7]=divideExcelData(dataset,addStrTitle,cmpMissData)
+[Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7,bestCorrTrain7,outTrain7,dataTest7,bestCorrdataTest7,outTest7]=divideExcelData(dataset,cmpMissData)
 
-for x in range(0,len(regressionMtd)):
+""" for x in range(0,len(regressionMtd)):
     try:
         os.remove("ERROR METRICS-"+operationMode[x]+".txt")
     except:
         pass          
-
-for x in range(0, len(regressionMtd)): 
-    lastErrors_regression[(x*3)]=runRun(dataTrain,dataTest,outputTrain,outputTest,x,"Modo1",addStrTitle)
-    lastErrors_regression[(x*3)+1]=runRun(bestCorrTrain7,bestCorrdataTest7,outTrain7,outTest7,x,"Modo2",addStrTitle)
+ """
+for x in range(0, len(regressionMtd)):
+    addStrTitle="-"+switch(x)
+    lastErrors_regression[(x*3)]=runRun(dataTrain,dataTest,outputTrain,outputTest,x,"Mode1",addStrTitle)
+    lastErrors_regression[(x*3)+1]=runRun(bestCorrTrain7,bestCorrdataTest7,outTrain7,outTest7,x,"Mode2",addStrTitle)
     lastErrors_regression[(x*3)+2]=runRun(inOutlessTrain7,dataTest7,outTrain7,outTest7,x,"Mode3",addStrTitle)
 
 plotFunction(fancy_boxplot,lastErrors_regression.values(),0,'bx-',title="Error Boxplot"+addStrTitle, ylabel='Errors',xlabel='Test',facecolor=randomColor(len(regressionMtd),len(mode)),labels=list(itertools.product(operationMode, mode)))
