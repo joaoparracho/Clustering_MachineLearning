@@ -48,7 +48,11 @@ def runRun(dataTrain,dataTest,outputTrain,outputTest,rmt,mode,addtitleTxt):
     #print("EVALUATE ERROR METRICS","\nMAE",MAE_regression_Test,"\nMSE:",MSE_regression_Test,"\nRMSE:",RMSE_regression_Test,"\nSSE:",SSE_regression_Test,"\nMAPE:",MAPE_regression_Test,"\n")
     Errors_regression_Train=np.subtract(outputTrain,Y_pred)
     Errors_regression=np.concatenate((Errors_regression_Train,Errors_regression_Test))
-    plotFunction(plt.boxplot,Errors_regression,0,'bx-',title=str(operationMode[rmt]+"-"+mode+addtitleTxt), ylabel='Errors',xlabel='Test')
+    plotFunction(plt.boxplot,Errors_regression,0,'bx-',title=str(operationMode[rmt]+"-"+mode+" "+addtitleTxt), ylabel='Errors',xlabel='Test')
+    plotFunction(plt.plot,np.arange(0,len(outputTest))/24,outputTest-Y_pred_Test,'bx-',title=str(operationMode[rmt]+"-"+mode+" "+addtitleTxt+" "), ylabel='Errors',xlabel='Days')
+    plt.plot(np.arange(0,len(np.concatenate([outputTrain,outputTest])))/24,np.concatenate([outputTrain,outputTest]),'r')
+    plt.plot(np.arange(0,len(np.concatenate([Y_pred,Y_pred_Test])))/24,np.concatenate([Y_pred,Y_pred_Test]),'b')
+    plt.show()
     writeLogs("logs/ERROR METRICS-"+operationMode[rmt]+"-"+addtitleTxt+".txt",3,[str(MAE_regression_Test),str(MSE_regression_Test),str(RMSE_regression_Test),str(SSE_regression_Test),str(MAPE_regression_Test)],["MAE","MSE","RMSE","SSE","MAPE"],"EVALUATE ERROR METRICS\n"+operationMode[rmt],mode)
     return Errors_regression.reshape(-1,1)
    
