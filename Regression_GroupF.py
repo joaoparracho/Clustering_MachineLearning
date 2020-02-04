@@ -49,7 +49,7 @@ def runRun(dataTrain,dataTest,outputTrain,outputTest,rmt,mode,addtitleTxt):
     Errors_regression_Train=np.subtract(outputTrain,Y_pred)
     Errors_regression=np.concatenate((Errors_regression_Train,Errors_regression_Test))
     plotFunction(plt.boxplot,Errors_regression,0,'bx-',title=str(operationMode[rmt]+"-"+mode+" "+addtitleTxt), ylabel='Errors',xlabel='Test')
-    plotFunction(plt.plot,np.arange(0,len(outputTest))/24,outputTest-Y_pred_Test,'bx-',title=str(operationMode[rmt]+"-"+mode+" "+addtitleTxt+" "), ylabel='Errors',xlabel='Days')
+    plotFunction(plt.plot,np.arange(0,len(outputTest))/24,Errors_regression_Test,'bx-',title=str(operationMode[rmt]+"-"+mode+" "+addtitleTxt+" "), ylabel='Errors',xlabel='Days')
     plt.plot(np.arange(0,len(np.concatenate([outputTrain,outputTest])))/24,np.concatenate([outputTrain,outputTest]),'r')
     plt.plot(np.arange(0,len(np.concatenate([Y_pred,Y_pred_Test])))/24,np.concatenate([Y_pred,Y_pred_Test]),'b')
     plt.show()
