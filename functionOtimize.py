@@ -105,7 +105,8 @@ def plot3Dispersidade(data3D,cluster,centroids=[],title="3Dscatter"):
     ax.set_ylabel('Feature Y')
     ax.set_zlabel('Feature Z')
 
-    plt.show()
+    plt.savefig('figures/'+title+'.png',bbox_inches='tight')  
+    plt.close() 
     
 def readExcel(excelPath,numSkipedRow=0,sheetName="Clustering"):
     return pd.read_excel(excelPath,sheetName,skiprows=numSkipedRow)

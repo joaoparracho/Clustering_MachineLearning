@@ -49,12 +49,12 @@ for i in range(0,len(data[0]),2):
     plotBiDispersidade(data,C,i,centroids,clusterMtdStr[cmt]+str(i)+" with Feature " +str(i+1)+strMethod)
        
 plotBiDispersidade(data,None,0,title="Feature 0 with Feature 1"+strMethod)
-plotFunction(fancy_dendrogram,dataLink,labels=np.array(dataset.values)[:,0],max_d=(dataLink[-numCluster+1,2]+dataLink[-numCluster,2])/2,title="Denogram2, distMethod="+distanceMethod+", linkMethod=" +linkageMethod,
+plotFunction(fancy_dendrogram,dataLink,labels=np.array(dataset.values)[:,0],max_d=(dataLink[-numCluster+1,2]+dataLink[-numCluster,2])/2,title="Denogram, NumClusters= "+str(numCluster) +"distMethod="+distanceMethod+", linkMethod=" +linkageMethod,
 ylabel='Distance',xlabel='ID')
-
+strMethod="3D_"+strMethod
 [data3D,dataLink3D]=treeDscatterData(dataset,cmpMissData,adaptData,distanceMethod,linkageMethod)
 [C3D,centroids3D]=clusteringMtd[cmt](data3D,dataLink3D,numCluster,strMethod)
-plot3Dispersidade(data3D,C3D,centroids3D,"3Dscatter")
+plot3Dispersidade(data3D,C3D,centroids3D,"3Dscatter_NumClusters= "+str(numCluster) +"distMethod="+distanceMethod+", linkMethod=" +linkageMethod)
 
 
 # %%prin
