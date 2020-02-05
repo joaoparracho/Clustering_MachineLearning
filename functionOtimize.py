@@ -339,11 +339,11 @@ def writeLog(fileName,numObgjW,listStr,listStrTitle):
         file1.write(listStr[i])
     file1.close()
 
-def switch(i,deg,nn,activation,validation_fraction,c,kernel,epsilon):
+def switch(i,deg,nn,activation,c,kernel,epsilon):
         switcher={
                 0:'',
                 1:"deg="+str(deg),
-                2:"nn="+str(nn)+" activation="+str(activation) +" validation_fraction="+str(validation_fraction),
+                2:"nn="+str(nn)+" activation="+str(activation),
                 3:"c="+str(c) + " kernel=" +str(kernel) + " epsilon="+str(epsilon),
                 4:'',
              }
