@@ -76,8 +76,18 @@ def plotFunction(function,*positionalParm,**keyParam):
     title=keyParam.pop('title')
     plt.xlabel(keyParam.pop('xlabel'))
     plt.ylabel(keyParam.pop('ylabel'))
+    if 'label' in keyParam:
+        label=(keyParam.pop('label'))
     plt.title(title)
-    function(*positionalParm,**keyParam)
+    if 'x' in keyParam:
+        if 'my_xticks' in keyParam:
+            plt.xticks(keyParam.pop('x'), keyParam.pop('my_xticks'))
+
+    c=function(*positionalParm,**keyParam)
+    try:
+        plt.legend(c,label,loc='best')
+    except:
+        pass
     plt.savefig('figures/'+title+'.png',bbox_inches='tight')  
     plt.close()  
 
@@ -122,7 +132,7 @@ def computeExcelData(excelDataSet,cmpMissData=1,adaptData=1,distanceMethod="eucl
     print(squareform(dataDist))
     return excelDataSet.columns.values,data,dataDist,dataLink
 
-def divideExcelData(excelDataSet,addStrTitle,cmpMissData=1):
+def divideExcelData(excelDataSet,cmpMissData=1):
     excelDataSet.fillna(excelDataSet.mean(),inplace=True) if cmpMissData else  excelDataSet.dropna(inplace=True) 
     Inputs=np.array(excelDataSet)[:,1:len(excelDataSet.columns)-1]
     Outputs=np.array(excelDataSet)[:,len(excelDataSet.columns)-1]
@@ -132,13 +142,10 @@ def divideExcelData(excelDataSet,addStrTitle,cmpMissData=1):
     # Wind Speed (m/s) --> 0.21149389
     for x in range(0, 3):
         print(np.corrcoef(Inputs[:,x].astype(float),Outputs.astype(float)))
-    
-    print('\n')  
     # Autocorrelation of Output --> segundo a autocorrelação a "periodo" de repetição é de 169/24=7dias 
     plot_acf(Outputs.astype(float), lags=200)
-    plt.savefig("figures/Autocorrelation"+addStrTitle+".png",bbox_inches='tight')  
+    plt.savefig("figures/Autocorrelation.png",bbox_inches='tight')  
     plt.close() 
-
     #1Novembro 7298 --> 31 Dezembro fim dados
     dataTrain=np.array(excelDataSet)[0:7296,1:len(excelDataSet.columns)-1]
     outputTrain=np.array(excelDataSet)[0:7296,len(excelDataSet.columns)-1]
@@ -332,3 +339,13 @@ def writeLog(fileName,numObgjW,listStr,listStrTitle):
         file1.write("\n====="+listStrTitle[i]+"=====\n")
         file1.write(listStr[i])
     file1.close()
+
+def switch(i,deg,nn,activation,validation_fraction,c,kernel,epsilon):
+        switcher={
+                0:'',
+                1:"deg="+str(deg),
+                2:"nn="+str(nn)+" activation="+str(activation) +" validation_fraction="+str(validation_fraction),
+                3:"c="+str(c) + " kernel=" +str(kernel) + " epsilon="+str(epsilon),
+                4:'',
+             }
+        return switcher.get(i,"Invalid")
