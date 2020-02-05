@@ -76,8 +76,18 @@ def plotFunction(function,*positionalParm,**keyParam):
     title=keyParam.pop('title')
     plt.xlabel(keyParam.pop('xlabel'))
     plt.ylabel(keyParam.pop('ylabel'))
+    if 'label' in keyParam:
+        label=(keyParam.pop('label'))
     plt.title(title)
-    function(*positionalParm,**keyParam)
+    if 'x' in keyParam:
+        if 'my_xticks' in keyParam:
+            plt.xticks(keyParam.pop('x'), keyParam.pop('my_xticks'))
+
+    c=function(*positionalParm,**keyParam)
+    try:
+        plt.legend(c,label,loc='best')
+    except:
+        pass
     plt.savefig('figures/'+title+'.png',bbox_inches='tight')  
     plt.close()  
 
