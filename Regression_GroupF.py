@@ -58,7 +58,7 @@ for x in range(0, len(regressionMtd)-1):
     lastErrors_regression[(x*3)+1]=runRun(bestCorrTrain7,bestCorrdataTest7,outTrain7,outTest7,x,"Mode2",addStrTitle)
     lastErrors_regression[(x*3)+2]=runRun(inOutlessTrain7,dataTest7,outTrain7,outTest7,x,"Mode3",addStrTitle)
 
-plotFunction(fancy_boxplot,lastErrors_regression.values(),0,'o','bx-',title="Error Boxplot"+addStrTitle, ylabel='Errors',xlabel='Test',facecolor=randomColor(len(regressionMtd),len(mode)),labels=list(itertools.product(operationMode, mode)))
+plotFunction(fancy_boxplot,lastErrors_regression.values(),0,'o','bx-',title="Error Boxplot "+addStrTitle, ylabel='Errors',xlabel='Test',facecolor=randomColor(len(regressionMtd),len(mode)),labels=list(itertools.product(operationMode, mode)))
 print("Execution Time")
 print("--- %.2d seconds ---" % (time.time() - start_time))
 
