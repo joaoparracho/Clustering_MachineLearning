@@ -54,7 +54,7 @@ ylabel='Distance',xlabel='ID')
 strMethod="3D_"+strMethod
 [data3D,dataLink3D]=treeDscatterData(dataset,cmpMissData,adaptData,distanceMethod,linkageMethod)
 [C3D,centroids3D]=clusteringMtd[cmt](data3D,dataLink3D,numCluster,strMethod)
-plot3Dispersidade(data3D,C3D,centroids3D,"3Dscatter_NumClusters= "+str(numCluster) +"distMethod="+distanceMethod+", linkMethod=" +linkageMethod)
+plot3Dispersidade(data3D,C3D,centroids3D,"3Dscatter_"+ str(clusterMtdStr[cmt])"NumClusters= "+str(numCluster) +"distMethod="+distanceMethod+", linkMethod=" +linkageMethod)
 
 
 # %%prin

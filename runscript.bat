@@ -1,9 +1,7 @@
 @echo off
 echo.
 setlocal enabledelayedexpansion
-
 set /p DIR= Folder name with configs (Example cfg): 
-
 for /R %%y in (%DIR%\*.txt) do (
 	set /p ARGS=<%%y
 	echo.!ARGS! | findstr /C:"Clustering" 1>nul
@@ -13,4 +11,3 @@ for /R %%y in (%DIR%\*.txt) do (
 		python Clustering_GrupoF.py !ARGS!
 	)
 )
-:end

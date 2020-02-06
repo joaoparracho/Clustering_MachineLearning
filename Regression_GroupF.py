@@ -53,12 +53,12 @@ lastErrors_regression={}
 dataset=readExcel(datasetpath,int(numSkipedRow),sheetname)
 [Inputs,Outputs,dataTrain,dataTest,outputTrain,outputTest,inOutlessTrain7,bestCorrTrain7,outTrain7,dataTest7,bestCorrdataTest7,outTest7]=divideExcelData(dataset,cmpMissData)
 
-for x in range(0, len(regressionMtd)):
+for x in range(0, len(regressionMtd)-1):
     addStrTitle=switch(x,deg,nn,activation,validation_fraction,c,kernel,epsilon)
     lastErrors_regression[(x*3)]=runRun(dataTrain,dataTest,outputTrain,outputTest,x,"Mode1",addStrTitle)
     lastErrors_regression[(x*3)+1]=runRun(bestCorrTrain7,bestCorrdataTest7,outTrain7,outTest7,x,"Mode2",addStrTitle)
     lastErrors_regression[(x*3)+2]=runRun(inOutlessTrain7,dataTest7,outTrain7,outTest7,x,"Mode3",addStrTitle)
-
+addStrTitle="deg="+str(deg)+" nn="+str(nn)+" activation="+str(activation) +" validation_fraction="+str(validation_fraction)+"c="+str(c) + " kernel=" +str(kernel) + " epsilon="+str(epsilon)
 plotFunction(fancy_boxplot,lastErrors_regression.values(),0,'o','bx-',title="Error Boxplot"+addStrTitle, ylabel='Errors',xlabel='Test',facecolor=randomColor(len(regressionMtd),len(mode)),labels=list(itertools.product(operationMode, mode)))
 print("Execution Time")
 print("--- %.2d seconds ---" % (time.time() - start_time))

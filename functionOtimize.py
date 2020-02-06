@@ -186,7 +186,7 @@ def clusterHAlgorithm(data,dataLink,numCluster,strMethod):
     writeLog("logs/ClusterHierq"+strMethod+".txt",3,[str(C),str(centroids),str(numObjCluster)],
     ["C","centroids","numObjCluster"])
 
-    plotBar(numObjCluster.astype(int),title='Cluster_Number of objects per Cluster' + strMethod,ylabel='Number of Object',xlabel='Cluster Index',xIndex=len(numObjCluster))
+    plotBar(numObjCluster.astype(int),title='ClusterHierq_Number of objects per Cluster' + strMethod,ylabel='Number of Object',xlabel='Cluster Index',xIndex=len(numObjCluster))
     
     return C,centroids
 
@@ -243,7 +243,7 @@ def fuzzyCmeansAlgorithm(data,dataL,numCluster,strMethod):
     plotBar(numObjCluster.astype(int),title='FuzzyCmeans_Number of objects per CLuster'+strMethod, 
     ylabel='Number of Object',xlabel='Cluster Index',xIndex=len(numObjCluster))
     
-    return C,cluster_membership
+    return cluster_membership,centroids
 
 #def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest):  
 def linearRegressionF(dataTrain,dataTest,outputTrain,outputTest,*_):  
